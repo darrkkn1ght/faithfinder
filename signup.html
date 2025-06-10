@@ -122,7 +122,7 @@
             localStorage.setItem('faithfinder_user', JSON.stringify(data.user));
             msg.style.color = 'green';
             msg.textContent = 'Sign up successful! Redirecting...';
-            setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+            setTimeout(() => { window.location.href = 'index.html'; }, 2200);
         } catch (err) {
             msg.style.color = 'red';
             msg.textContent = err.message || 'Sign up failed.';

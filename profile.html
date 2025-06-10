@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - FaithFinder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Georgia', serif;
+            color: var(--text-primary, #2d3748);
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png') repeat;
+            opacity: 0.08;
+            z-index: 0;
+        }
+        .profile-section {
+            max-width: 480px;
+            margin: 4rem auto 2rem auto;
+            background: rgba(255,255,255,0.98);
+            border-radius: 2rem;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13), 0 1.5px 8px rgba(118, 75, 162, 0.08);
+            padding: 2.5rem 2rem 2rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-section h2 {
+            margin-bottom: 2rem;
+            font-size: 2.1rem;
+            font-weight: 800;
+            text-align: center;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+        .profile-card {
+            background: linear-gradient(120deg, #f0f4ff 80%, #f7fafc 100%);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+            padding: 2rem 1.2rem 1.5rem 1.2rem;
+            margin-bottom: 2.2rem;
+            text-align: center;
+            position: relative;
+        }
+        .profile-avatar-img {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 16px rgba(102, 126, 234, 0.18);
+            border: 4px solid #a5b4fc;
+            margin-bottom: 1.1rem;
+            transition: box-shadow 0.3s, border 0.3s, transform 0.2s;
+        }
+        .profile-avatar-img:hover {
+            box-shadow: 0 6px 32px #764ba2a0;
+            border: 4px solid #764ba2;
+            transform: scale(1.06) rotate(-2deg);
+        }
+        .profile-username {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+        }
+        .profile-email {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.7rem;
+        }
+        .profile-bio {
+            font-size: 1.08rem;
+            color: var(--text-primary);
+            margin-bottom: 0.7rem;
+            font-style: italic;
+            background: #f7fafc;
+            border-radius: 0.7rem;
+            padding: 0.7rem 1rem;
+            box-shadow: 0 1px 4px #e0e7ff44;
+        }
+        .profile-form {
+            margin-bottom: 1.5rem;
+        }
+        .profile-form-section {
+            background: linear-gradient(120deg, #e0e7ff 80%, #f7fafc 100%);
+            border-radius: 1.2rem;
+            box-shadow: 0 2px 12px #a5b4fc22;
+            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 1.7rem;
+            position: relative;
+        }
+        .profile-form .section-title {
+            font-size: 1.13rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0 0 1.2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .profile-form label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-color);
+            display: block;
+            margin-left: 0.1rem;
+        }
+        .profile-form input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 0.8rem;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #a5b4fc22;
+            margin-bottom: 1.2rem;
+            border: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .custom-file-upload:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.04);
+        }
+        .file-name {
+            font-size: 0.98rem;
+            color: #764ba2;
+            margin-bottom: 1.2rem;
+            display: block;
+            text-align: center;
+        }
+        .profile-form input[type="text"],
+        .profile-form input[type="email"],
+        .profile-form input[type="password"],
+        .profile-form textarea {
+            width: 100%;
+            margin-bottom: 1.2rem;
+            padding: 0.95rem 1.1rem 0.95rem 1.1rem;
+            border-radius: 0.8rem;
+            border: 1.5px solid var(--border-color);
+            background: #f7fafc;
+            font-size: 1.08rem;
+            color: var(--text-primary);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 1.5px 8px #a5b4fc11;
+        }
+        .profile-form input:focus, .profile-form textarea:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 2px #a5b4fc55;
+            outline: none;
+        }
+        .profile-form textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .profile-form button[type="submit"], .profile-form .remove-btn, .profile-form button[type="button"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 0.9rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px #a5b4fc22;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.5rem;
+            margin-right: 0.5rem;
+        }
+        .profile-form button[type="submit"]:hover, .profile-form .remove-btn:hover, .profile-form button[type="button"]:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 32px #764ba233;
+        }
+        .profile-form .remove-btn {
+            background: #e53e3e;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
+        }
+        #profileMsg {
+            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            min-height: 1.2em;
+            text-align: center;
+            font-weight: 600;
+        }
+        .profile-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+            text-decoration: underline;
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            .profile-section {
+                padding: 1rem 0.2rem;
+            }
+            .profile-card, .profile-form-section {
+                padding: 1rem 0.5rem 0.7rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="profile-section">
+        <h2><i class="fas fa-user"></i> My Profile</h2>
+        <div class="profile-card" id="profileCard"></div>
+        <form class="profile-form" id="profileForm">
+            <div class="profile-form-section">
+                <div class="section-title"><i class="fas fa-image"></i> Profile Picture</div>
+                <label for="profileImage" class="custom-file-upload"><i class="fas fa-upload"></i> Choose Image</label>
+                <input type="file" id="profileImage" accept="image/*">
+                <span class="file-name" id="fileName"></span>
+                <button type="submit"><i class="fas fa-upload"></i> Save</button>
+                <button type="button" class="remove-btn" id="removeImageBtn"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+            <div class="profile-form-section">
+                <div class="section-title"><i class="fas fa-user-edit"></i> Edit Info</div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" required maxlength="32" autocomplete="username">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required maxlength="64" autocomplete="email">
+                <label for="bio">Bio/About:</label>
+                <textarea id="bio" maxlength="200" rows="2" placeholder="Tell us about yourself..."></textarea>
+                <button type="button" id="saveInfoBtn"><i class="fas fa-save"></i> Save Info</button>
+            </div>
+            <div class="profile-form-section">
+                <div class="section-title"><i class="fas fa-key"></i> Change Password</div>
+                <label for="currentPassword">Current Password:</label>
+                <input type="password" id="currentPassword" autocomplete="current-password">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" autocomplete="new-password">
+                <label for="confirmPassword">Confirm New Password:</label>
+                <input type="password" id="confirmPassword" autocomplete="new-password">
+                <button type="button" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+            </div>
+            <div id="profileMsg"></div>
+        </form>
+        <a href="index.html" class="profile-link">Back to Home</a>
+    </section>
+    <script>
+    const API_URL = 'http://localhost:3001/api/auth';
+    let user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('faithfinder_user') || 'null');
+    } catch { user = null; }
+    const profileCard = document.getElementById('profileCard');
+    function renderProfileCard() {
+        if (!user) {
+            profileCard.innerHTML = '<div style="color:red;text-align:center;">Please <a href="login.html">sign in</a> to edit your profile.</div>';
+            document.getElementById('profileForm').style.display = 'none';
+            return;
+        }
+        let avatar = user.profileImage ? `<img src="${user.profileImage}" class="profile-avatar-img" alt="Profile">` : `<img src="${user.avatarUrl}" class="profile-avatar-img" alt="Avatar">`;
+        let bio = user.bio ? `<div class="profile-bio">${user.bio.replace(/</g, '&lt;')}</div>` : '';
+        profileCard.innerHTML = `
+            ${avatar}
+            <div class="profile-username">${user.username}</div>
+            <div class="profile-email">${user.email}</div>
+            ${bio}
+        `;
+        document.getElementById('username').value = user.username;
+        document.getElementById('email').value = user.email;
+        document.getElementById('bio').value = user.bio || '';
+    }
+    renderProfileCard();
+    // Custom file upload styling
+    const fileInput = document.getElementById('profileImage');
+    const fileName = document.getElementById('fileName');
+    document.querySelector('.custom-file-upload').onclick = function() {
+        fileInput.click();
+    };
+    fileInput.onchange = function() {
+        fileName.textContent = fileInput.files[0] ? fileInput.files[0].name : '';
+    };
+    // Profile image upload
+    document.getElementById('profileForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        if (!user) return;
+        const msg = document.getElementById('profileMsg');
+        msg.textContent = '';
+        if (!fileInput.files[0]) {
+            msg.style.color = 'red';
+            msg.textContent = 'Please select an image.';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = async function(evt) {
+            const base64 = evt.target.result;
+            try {
+                const res = await fetch(API_URL + '/profile-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('faithfinder_token')
+                    },
+                    body: JSON.stringify({ image: base64 })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Upload failed.');
+                user.profileImage = data.profileImage;
+                localStorage.setItem('faithfinder_user', JSON.stringify(user));
+                renderProfileCard();
+                msg.style.color = 'green';
+                msg.textContent = 'Profile image updated!';
+                fileName.textContent = '';
+            } catch (err) {
+                msg.style.color = 'red';
+                msg.textContent = err.message || 'Upload failed.';
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    });
+    // Remove profile image
+    document.getElementById('removeImageBtn').onclick = async function() {
+        if (!user) return;
+        const msg = document.getElementById('profileMsg');
+        msg.textContent = '';
+        try {
+            const res = await fetch(API_URL + '/profile-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('faithfinder_token')
+                },
+                body: JSON.stringify({ image: '' })
+            });
+            user.profileImage = '';
+            localStorage.setItem('faithfinder_user', JSON.stringify(user));
+            renderProfileCard();
+            msg.style.color = 'green';
+            msg.textContent = 'Profile image removed.';
+        } catch (err) {
+            msg.style.color = 'red';
+            msg.textContent = err.message || 'Remove failed.';
+        }
+    };
+    // Save username/email/bio
+    document.getElementById('saveInfoBtn').onclick = async function() {
+        if (!user) return;
+        const msg = document.getElementById('profileMsg');
+        msg.textContent = '';
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+        if (!username || !email) {
+            msg.style.color = 'red';
+            msg.textContent = 'Username and email required.';
+            return;
+        }
+        try {
+            const res = await fetch(API_URL + '/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('faithfinder_token')
+                },
+                body: JSON.stringify({ username, email, bio })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Update failed.');
+            user.username = data.username;
+            user.email = data.email;
+            user.bio = data.bio;
+            localStorage.setItem('faithfinder_user', JSON.stringify(user));
+            renderProfileCard();
+            msg.style.color = 'green';
+            msg.textContent = 'Profile info updated!';
+        } catch (err) {
+            msg.style.color = 'red';
+            msg.textContent = err.message || 'Update failed.';
+        }
+    };
+    // Change password
+    document.getElementById('changePasswordBtn').onclick = async function() {
+        if (!user) return;
+        const msg = document.getElementById('profileMsg');
+        msg.textContent = '';
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            msg.style.color = 'red';
+            msg.textContent = 'All password fields required.';
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            msg.style.color = 'red';
+            msg.textContent = 'New passwords do not match.';
+            return;
+        }
+        try {
+            const res = await fetch(API_URL + '/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('faithfinder_token')
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Password change failed.');
+            msg.style.color = 'green';
+            msg.textContent = 'Password changed!';
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        } catch (err) {
+            msg.style.color = 'red';
+            msg.textContent = err.message || 'Password change failed.';
+        }
+    };
+    </script>
+</body>
+</html>

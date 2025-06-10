@@ -13,7 +13,7 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = 'faithfinder_secret_key'; // Change this in production!
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 // Helper to read/write JSON file
 function readRequests() {
@@ -270,6 +270,7 @@ app.post('/api/community/:postId/comments/:commentId/unflag', (req, res) => {
     res.json({ flagged: false });
 });
 
+
 // User registration (sign up)
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
@@ -284,29 +285,19 @@ app.post('/api/auth/signup', async (req, res) => {
         return res.status(400).json({ error: 'Username already taken.' });
     }
     const hashed = await bcrypt.hash(password, 10);
-    // Assign a random avatar
-    const avatars = [
-        { icon: 'fa-user', color: '#2563eb' },
-        { icon: 'fa-user-astronaut', color: '#22c55e' },
-        { icon: 'fa-user-ninja', color: '#f59e42' },
-        { icon: 'fa-user-tie', color: '#764ba2' },
-        { icon: 'fa-user-graduate', color: '#e53e3e' },
-        { icon: 'fa-user-secret', color: '#b91c1c' },
-        { icon: 'fa-user', color: '#1e293b' },
-        { icon: 'fa-user', color: '#fbbf24' }
-    ];
-    const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+    // Assign a DiceBear avatar URL (using username as seed)
+    const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
     const user = {
         id: Date.now().toString(),
         username,
         email,
         password: hashed,
-        avatar: randomAvatar
+        avatarUrl
     };
     users.push(user);
     writeUsers(users);
     const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatar: user.avatar } });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl } });
 });
 
 // User login (sign in)
@@ -320,9 +311,10 @@ app.post('/api/auth/login', async (req, res) => {
     if (!user) return res.status(400).json({ error: 'Invalid credentials.' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: 'Invalid credentials.' });
-    const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatar: user.avatar } });
+        const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, verified: user.verified } });
 });
+
 
 // Get current user info from token
 app.get('/api/auth/me', (req, res) => {
@@ -333,7 +325,78 @@ app.get('/api/auth/me', (req, res) => {
         const users = readUsers();
         const user = users.find(u => u.id === decoded.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ id: user.id, username: user.username, email: user.email, avatar: user.avatar });
+        res.json({ id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, profileImage: user.profileImage, bio: user.bio });
+    } catch {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+});
+
+// Upload/update profile image
+app.post('/api/auth/profile-image', (req, res) => {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
+    try {
+        const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
+        const users = readUsers();
+        const idx = users.findIndex(u => u.id === decoded.id);
+        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const { image } = req.body;
+        if (!image) {
+            users[idx].profileImage = '';
+            writeUsers(users);
+            return res.json({ profileImage: '' });
+        }
+        if (typeof image !== 'string' || !image.startsWith('data:image/')) {
+            return res.status(400).json({ error: 'Invalid image data.' });
+        }
+        users[idx].profileImage = image;
+        writeUsers(users);
+        res.json({ profileImage: image });
+    } catch {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+});
+
+// Update username/email
+app.post('/api/auth/update', (req, res) => {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
+    try {
+        const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
+        const users = readUsers();
+        const idx = users.findIndex(u => u.id === decoded.id);
+        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const { username, email, bio } = req.body;
+        if (!username || !email) return res.status(400).json({ error: 'Username and email required.' });
+        // Check for duplicate username/email
+        if (users.some((u, i) => i !== idx && u.username === username)) return res.status(400).json({ error: 'Username already taken.' });
+        if (users.some((u, i) => i !== idx && u.email === email)) return res.status(400).json({ error: 'Email already registered.' });
+        users[idx].username = username;
+        users[idx].email = email;
+        if (typeof bio === 'string') users[idx].bio = bio;
+        writeUsers(users);
+        res.json({ username, email, bio: users[idx].bio });
+    } catch {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+});
+
+// Change password
+app.post('/api/auth/change-password', async (req, res) => {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
+    try {
+        const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
+        const users = readUsers();
+        const idx = users.findIndex(u => u.id === decoded.id);
+        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) return res.status(400).json({ error: 'All password fields required.' });
+        const match = await bcrypt.compare(currentPassword, users[idx].password);
+        if (!match) return res.status(400).json({ error: 'Current password is incorrect.' });
+        users[idx].password = await bcrypt.hash(newPassword, 10);
+        writeUsers(users);
+        res.json({ changed: true });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
     }

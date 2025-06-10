@@ -444,7 +444,10 @@
         }
     }
 
-    function renderAvatar(avatar) {
+    function renderAvatar(avatar, avatarUrl) {
+        if (avatarUrl) {
+            return `<span class="avatar" style="width:2.3rem;height:2.3rem;overflow:hidden;display:inline-block;"><img src="${avatarUrl}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'"></span>`;
+        }
         if (!avatar) return '';
         return `<span class="avatar" style="background:${avatar.color};"><i class="fas ${avatar.icon}"></i></span>`;
     }
@@ -463,7 +466,7 @@
             html += `
             <div class="community-card ${pinned.type} pinned${pinned.flagged ? ' flagged' : ''}">
                 <div class="community-meta">
-                    ${renderAvatar(pinned.avatar)}
+                    ${renderAvatar(pinned.avatar, pinned.avatarUrl)}
                     <span class="community-type ${pinned.type}">
                         ${pinned.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
                         ${pinned.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
@@ -483,7 +486,7 @@
                     <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
                     ${pinned.comments && pinned.comments.length ? pinned.comments.map(comment => `
                         <div class="comment${comment.flagged ? ' flagged' : ''}">
-                            <div class="comment-meta">${renderAvatar(comment.avatar)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${pinned.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
+                            <div class="comment-meta">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${pinned.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
                             <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
                         </div>
                     `).join('') : '<div style="color:#888;">No comments yet.</div>'}
@@ -500,7 +503,7 @@
         html += rest.map(post => `
             <div class="community-card ${post.type}${post.flagged ? ' flagged' : ''}">
                 <div class="community-meta">
-                    ${renderAvatar(post.avatar)}
+                    ${renderAvatar(post.avatar, post.avatarUrl)}
                     <span class="community-type ${post.type}">
                         ${post.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
                         ${post.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
@@ -519,7 +522,7 @@
                     <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
                     ${post.comments && post.comments.length ? post.comments.map(comment => `
                         <div class="comment${comment.flagged ? ' flagged' : ''}">
-                            <div class="comment-meta">${renderAvatar(comment.avatar)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${post.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
+                            <div class="comment-meta">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${post.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
                             <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
                         </div>
                     `).join('') : '<div style="color:#888;">No comments yet.</div>'}
