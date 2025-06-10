@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithFinder Community Wall</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: var(--font-family, Georgia, serif);
+            color: var(--text-primary, #2d3748);
+        }
+        .community-section {
+            max-width: 700px;
+            margin: 3rem auto 2rem auto;
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem 2rem 2rem 2rem;
+            position: relative;
+        }
+        .community-section h2 {
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+        }
+        .community-form {
+            margin-bottom: 2.5rem;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            padding: 1.5rem 1rem 1rem 1rem;
+        }
+        .community-form label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+            color: var(--primary-color);
+        }
+        .community-form select,
+        .community-form textarea {
+            width: 100%;
+            margin-bottom: 1.2rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.7rem;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-card);
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+        .community-form select:focus,
+        .community-form textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+        .community-form button[type="submit"] {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: #fff;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 0.7rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.13);
+            transition: background 0.3s, transform 0.2s;
+        }
+        .community-form button[type="submit"]:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            transform: translateY(-2px) scale(1.03);
+        }
+        #communityFormMsg {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            min-height: 1.2em;
+        }
+        .community-list {
+            margin-top: 2rem;
+        }
+        .community-card {
+            border-left: 6px solid var(--secondary-color);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 1.7rem;
+            position: relative;
+            background: linear-gradient(120deg, var(--bg-secondary) 80%, #e0e7ff 100%);
+            transition: box-shadow 0.2s;
+        }
+        .community-card.encouragement { border-left-color: #22c55e; }
+        .community-card.testimony { border-left-color: #2563eb; }
+        .community-card.answered { border-left-color: #f59e42; }
+        .community-card:hover {
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.18);
+        }
+        .community-meta {
+            color: var(--text-secondary);
+            font-size: 0.98em;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .community-type {
+            font-weight: bold;
+            text-transform: capitalize;
+            padding: 0.2em 0.7em;
+            border-radius: 1em;
+            font-size: 0.95em;
+            margin-right: 0.7em;
+        }
+        .community-type.encouragement { background: #dcfce7; color: #166534; }
+        .community-type.testimony { background: #dbeafe; color: #1e40af; }
+        .community-type.answered { background: #fef3c7; color: #b45309; }
+        .community-card .community-type i { margin-right: 0.3em; }
+        .community-card .community-message {
+            font-size: 1.13rem;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+        /* Comments */
+        .comments-section {
+            margin-top: 1.2rem;
+            background: #f7fafc;
+            border-radius: 0.7rem;
+            padding: 1rem 0.8rem 0.7rem 0.8rem;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.07);
+        }
+        .comment {
+            margin-bottom: 0.7rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .comment:last-child {
+            border-bottom: none;
+        }
+        .comment-meta {
+            color: #888;
+            font-size: 0.93em;
+            margin-bottom: 0.2rem;
+        }
+        .comment-message {
+            font-size: 1.01rem;
+            color: var(--text-primary);
+        }
+        .comment-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.7rem;
+        }
+        .comment-form input[type="text"] {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+        }
+        .comment-form button {
+            background: var(--secondary-color);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .comment-form button:hover {
+            background: var(--accent-color);
+        }
+        .comment-form .comment-msg {
+            font-size: 0.95em;
+            margin-left: 0.5rem;
+            color: #b91c1c;
+            align-self: center;
+        }
+        @media (max-width: 600px) {
+            .community-section {
+                padding: 1rem 0.2rem;
+            }
+            .community-form {
+                padding: 1rem 0.3rem 0.7rem 0.3rem;
+            }
+            .community-card {
+                padding: 1rem 0.5rem 0.7rem 0.7rem;
+            }
+            .comments-section {
+                padding: 0.7rem 0.3rem 0.5rem 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="community-section">
+        <h2><i class="fas fa-users"></i> Community Wall</h2>
+        <form class="community-form" id="communityForm">
+            <label for="communityType">Type:</label>
+            <select id="communityType">
+                <option value="encouragement">Encouragement</option>
+                <option value="testimony">Testimony</option>
+                <option value="answered">Answered Prayer</option>
+            </select>
+            <label for="communityMessage">Your Message:</label>
+            <textarea id="communityMessage" rows="3" maxlength="500" required placeholder="Share encouragement, a testimony, or an answered prayer..."></textarea>
+            <button type="submit" class="secondary-btn"><i class="fas fa-paper-plane"></i> Post</button>
+            <div id="communityFormMsg"></div>
+        </form>
+        <div class="community-list" id="communityList">
+            <!-- Community posts will be loaded here -->
+        </div>
+        <div style="margin-top:2rem; text-align:center;">
+            <a href="index.html" class="secondary-btn"><i class="fas fa-home"></i> Back to FaithFinder</a>
+        </div>
+    </section>
+    <script>
+    const API_URL = 'http://localhost:3001/api/community';
+
+    async function fetchCommunity() {
+        const res = await fetch(API_URL);
+        return res.json();
+    }
+
+    async function submitCommunity(data) {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Failed to submit');
+        return res.json();
+    }
+
+    async function submitComment(postId, message) {
+        const res = await fetch(`${API_URL}/${postId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Failed to submit comment');
+        return res.json();
+    }
+
+    function renderCommunity(posts) {
+        const communityList = document.getElementById('communityList');
+        if (!posts.length) {
+            communityList.innerHTML = '<p style="color:var(--text-secondary); text-align:center;">No posts yet. Be the first to share encouragement, a testimony, or an answered prayer!</p>';
+            return;
+        }
+        communityList.innerHTML = posts.map(post => `
+            <div class="community-card ${post.type}">
+                <div class="community-meta">
+                    <span class="community-type ${post.type}">
+                        ${post.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
+                        ${post.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
+                        ${post.type === 'answered' ? '<i class=\'fas fa-star\'></i>Answered' : ''}
+                    </span>
+                    <span>${new Date(post.createdAt).toLocaleString()}</span>
+                </div>
+                <div class="community-message">${post.message.replace(/</g, '&lt;')}</div>
+                <div class="comments-section" id="comments-${post.id}">
+                    <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
+                    ${post.comments && post.comments.length ? post.comments.map(comment => `
+                        <div class="comment">
+                            <div class="comment-meta">${new Date(comment.createdAt).toLocaleString()}</div>
+                            <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
+                        </div>
+                    `).join('') : '<div style="color:#888;">No comments yet.</div>'}
+                    <form class="comment-form" data-postid="${post.id}" onsubmit="return false;">
+                        <input type="text" placeholder="Add a comment..." maxlength="200" required />
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        <span class="comment-msg"></span>
+                    </form>
+                </div>
+            </div>
+        `).join('');
+        // Attach comment form handlers
+        document.querySelectorAll('.comment-form').forEach(form => {
+            form.onsubmit = async function(e) {
+                e.preventDefault();
+                const postId = form.getAttribute('data-postid');
+                const input = form.querySelector('input');
+                const msgSpan = form.querySelector('.comment-msg');
+                msgSpan.textContent = '';
+                const message = input.value.trim();
+                if (message.length < 1) {
+                    msgSpan.textContent = 'Comment is too short.';
+                    return;
+                }
+                try {
+                    await submitComment(postId, message);
+                    input.value = '';
+                    msgSpan.style.color = 'green';
+                    msgSpan.textContent = 'Comment added!';
+                    setTimeout(() => { msgSpan.textContent = ''; }, 1200);
+                    loadCommunity();
+                } catch (err) {
+                    msgSpan.style.color = 'red';
+                    msgSpan.textContent = err.message || 'Failed to submit.';
+                }
+            };
+        });
+    }
+
+    async function loadCommunity() {
+        try {
+            const posts = await fetchCommunity();
+            renderCommunity(posts);
+        } catch {
+            document.getElementById('communityList').innerHTML = '<p style="color:red; text-align:center;">Failed to load community posts.</p>';
+        }
+    }
+
+    document.getElementById('communityForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const type = document.getElementById('communityType').value;
+        const message = document.getElementById('communityMessage').value.trim();
+        const msg = document.getElementById('communityFormMsg');
+        msg.textContent = '';
+        msg.style.color = '';
+        if (message.length < 3) {
+            msg.style.color = 'red';
+            msg.textContent = 'Message is too short.';
+            return;
+        }
+        try {
+            await submitCommunity({ type, message });
+            msg.style.color = 'green';
+            msg.textContent = 'Post submitted!';
+            document.getElementById('communityForm').reset();
+            loadCommunity();
+        } catch (err) {
+            msg.style.color = 'red';
+            msg.textContent = err.message || 'Failed to submit.';
+        }
+    });
+
+    loadCommunity();
+    </script>
+</body>
+</html>
