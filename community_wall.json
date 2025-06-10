@@ -4,8 +4,19 @@
     "type": "encouragement",
     "message": "well well well",
     "createdAt": "2025-06-10T13:07:52.003Z",
-    "comments": [],
-    "likes": 1,
+    "comments": [
+      {
+        "id": "1749565715238",
+        "message": "lovel",
+        "createdAt": "2025-06-10T14:28:35.238Z",
+        "flagged": false,
+        "avatar": {
+          "icon": "fa-user-tie",
+          "color": "#764ba2"
+        }
+      }
+    ],
+    "likes": 2,
     "flagged": false,
     "pinned": false,
     "avatar": {
@@ -19,7 +30,7 @@
     "message": "YOu can do it you can succeed",
     "createdAt": "2025-06-10T12:31:35.351Z",
     "comments": [],
-    "likes": 1
+    "likes": 2
   },
   {
     "id": "1749558629587",

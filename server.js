@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = 3001;
@@ -12,90 +13,98 @@ const COMMUNITY_FILE = path.join(__dirname, 'community_wall.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = 'faithfinder_secret_key'; // Change this in production!
 
+// MongoDB connection
+mongoose.connect('mongodb+srv://darkknight:Peter\_#123@faithfindercluster.dum2hdb.mongodb.net/?retryWrites=true&w=majority&appName=faithfindercluster', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// User schema/model
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    avatarUrl: String,
+    profileImage: String,
+    bio: String,
+    verified: Boolean
+});
+const User = mongoose.model('User', userSchema);
+
+// Prayer Request schema/model
+const prayerRequestSchema = new mongoose.Schema({
+    name: String,
+    request: String,
+    isAnonymous: Boolean,
+    createdAt: { type: Date, default: Date.now },
+    answered: { type: Boolean, default: false }
+});
+const PrayerRequest = mongoose.model('PrayerRequest', prayerRequestSchema);
+
+// Community Wall schema/model
+const commentSchema = new mongoose.Schema({
+    message: String,
+    createdAt: { type: Date, default: Date.now },
+    flagged: { type: Boolean, default: false },
+    avatar: Object
+});
+const communityPostSchema = new mongoose.Schema({
+    type: { type: String, default: 'encouragement' },
+    message: String,
+    createdAt: { type: Date, default: Date.now },
+    comments: [commentSchema],
+    likes: { type: Number, default: 0 },
+    flagged: { type: Boolean, default: false },
+    pinned: { type: Boolean, default: false },
+    avatar: Object
+});
+const CommunityPost = mongoose.model('CommunityPost', communityPostSchema);
+
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 
 // Helper to read/write JSON file
-function readRequests() {
-    if (!fs.existsSync(DATA_FILE)) return [];
-    try {
-        return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    } catch {
-        return [];
-    }
-}
-function writeRequests(requests) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(requests, null, 2));
-}
-// Community Wall helpers
-function readCommunity() {
-    if (!fs.existsSync(COMMUNITY_FILE)) return [];
-    try {
-        return JSON.parse(fs.readFileSync(COMMUNITY_FILE, 'utf8'));
-    } catch {
-        return [];
-    }
-}
-function writeCommunity(posts) {
-    fs.writeFileSync(COMMUNITY_FILE, JSON.stringify(posts, null, 2));
-}
-// User helpers
-function readUsers() {
-    if (!fs.existsSync(USERS_FILE)) return [];
-    try {
-        return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-    } catch {
-        return [];
-    }
-}
-function writeUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
+// MongoDB now handles all data, so these are no longer needed.
 
 // Get all prayer requests
-app.get('/api/prayer-requests', (req, res) => {
-    const requests = readRequests();
+app.get('/api/prayer-requests', async (req, res) => {
+    const requests = await PrayerRequest.find().sort({ createdAt: -1 });
     res.json(requests);
 });
 
 // Submit a new prayer request
-app.post('/api/prayer-requests', (req, res) => {
+app.post('/api/prayer-requests', async (req, res) => {
     const { name, request, isAnonymous } = req.body;
     if (!request || typeof request !== 'string' || request.trim().length < 3) {
         return res.status(400).json({ error: 'Prayer request is too short.' });
     }
-    const newRequest = {
-        id: Date.now().toString(),
+    const newRequest = await PrayerRequest.create({
         name: isAnonymous ? 'Anonymous' : (name || 'Anonymous'),
         request: request.trim(),
-        createdAt: new Date().toISOString(),
-        answered: false
-    };
-    const requests = readRequests();
-    requests.unshift(newRequest); // newest first
-    writeRequests(requests);
+        isAnonymous: !!isAnonymous
+    });
     res.status(201).json(newRequest);
 });
 
 // Mark as answered
-app.patch('/api/prayer-requests/:id/answered', (req, res) => {
+app.patch('/api/prayer-requests/:id/answered', async (req, res) => {
     const { id } = req.params;
-    const requests = readRequests();
-    const idx = requests.findIndex(r => r.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Not found' });
-    requests[idx].answered = true;
-    writeRequests(requests);
-    res.json(requests[idx]);
+    const request = await PrayerRequest.findById(id);
+    if (!request) return res.status(404).json({ error: 'Not found' });
+    request.answered = true;
+    await request.save();
+    res.json(request);
 });
 
 // Get all community wall posts
-app.get('/api/community', (req, res) => {
-    const posts = readCommunity();
+app.get('/api/community', async (req, res) => {
+    const posts = await CommunityPost.find().sort({ createdAt: -1 });
     res.json(posts);
 });
 
 // Submit a new community wall post
-app.post('/api/community', (req, res) => {
+app.post('/api/community', async (req, res) => {
     const { type, message } = req.body;
     if (!message || typeof message !== 'string' || message.trim().length < 3) {
         return res.status(400).json({ error: 'Message is too short.' });
@@ -112,33 +121,23 @@ app.post('/api/community', (req, res) => {
         { icon: 'fa-user', color: '#fbbf24' }
     ];
     const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
-    const newPost = {
-        id: Date.now().toString(),
-        type: type || 'encouragement', // encouragement, testimony, answered
+    const newPost = await CommunityPost.create({
+        type: type || 'encouragement',
         message: message.trim(),
-        createdAt: new Date().toISOString(),
-        comments: [], // array of {id, message, createdAt, flagged, avatar}
-        likes: 0,
-        flagged: false,
-        pinned: false,
         avatar: randomAvatar
-    };
-    const posts = readCommunity();
-    posts.unshift(newPost); // newest first
-    writeCommunity(posts);
+    });
     res.status(201).json(newPost);
 });
 
 // Add a comment to a community post
-app.post('/api/community/:id/comments', (req, res) => {
+app.post('/api/community/:id/comments', async (req, res) => {
     const { id } = req.params;
     const { message } = req.body;
     if (!message || typeof message !== 'string' || message.trim().length < 1) {
         return res.status(400).json({ error: 'Comment is too short.' });
     }
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
     // Assign a random avatar to comment
     const avatars = [
         { icon: 'fa-user', color: '#2563eb' },
@@ -152,121 +151,106 @@ app.post('/api/community/:id/comments', (req, res) => {
     ];
     const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
     const comment = {
-        id: Date.now().toString(),
         message: message.trim(),
-        createdAt: new Date().toISOString(),
-        flagged: false,
         avatar: randomAvatar
     };
-    posts[idx].comments = posts[idx].comments || [];
-    posts[idx].comments.push(comment);
-    writeCommunity(posts);
-    res.status(201).json(comment);
+    post.comments.push(comment);
+    await post.save();
+    res.status(201).json(post.comments[post.comments.length - 1]);
 });
 
 // Like a community post
-app.post('/api/community/:id/like', (req, res) => {
+app.post('/api/community/:id/like', async (req, res) => {
     const { id } = req.params;
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts[idx].likes = (posts[idx].likes || 0) + 1;
-    writeCommunity(posts);
-    res.json({ likes: posts[idx].likes });
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.likes = (post.likes || 0) + 1;
+    await post.save();
+    res.json({ likes: post.likes });
 });
 
 // Flag a community post
-app.post('/api/community/:id/flag', (req, res) => {
+app.post('/api/community/:id/flag', async (req, res) => {
     const { id } = req.params;
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts[idx].flagged = true;
-    writeCommunity(posts);
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.flagged = true;
+    await post.save();
     res.json({ flagged: true });
 });
 
 // Flag a comment on a community post
-app.post('/api/community/:postId/comments/:commentId/flag', (req, res) => {
+app.post('/api/community/:postId/comments/:commentId/flag', async (req, res) => {
     const { postId, commentId } = req.params;
-    const posts = readCommunity();
-    const post = posts.find(p => p.id === postId);
+    const post = await CommunityPost.findById(postId);
     if (!post) return res.status(404).json({ error: 'Post not found' });
-    const comment = (post.comments || []).find(c => c.id === commentId);
+    const comment = post.comments.id(commentId) || post.comments.find(c => c._id.toString() === commentId);
     if (!comment) return res.status(404).json({ error: 'Comment not found' });
     comment.flagged = true;
-    writeCommunity(posts);
+    await post.save();
     res.json({ flagged: true });
 });
 
 // Pin a community post
-app.post('/api/community/:id/pin', (req, res) => {
+app.post('/api/community/:id/pin', async (req, res) => {
     const { id } = req.params;
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts.forEach(p => p.pinned = false); // Only one pinned at a time
-    posts[idx].pinned = true;
-    writeCommunity(posts);
+    await CommunityPost.updateMany({}, { pinned: false });
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.pinned = true;
+    await post.save();
     res.json({ pinned: true });
 });
 
 // Unpin a community post
-app.post('/api/community/:id/unpin', (req, res) => {
+app.post('/api/community/:id/unpin', async (req, res) => {
     const { id } = req.params;
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts[idx].pinned = false;
-    writeCommunity(posts);
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.pinned = false;
+    await post.save();
     res.json({ pinned: false });
 });
 
 // Delete a community post
-app.delete('/api/community/:id', (req, res) => {
+app.delete('/api/community/:id', async (req, res) => {
     const { id } = req.params;
-    let posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts.splice(idx, 1);
-    writeCommunity(posts);
+    const post = await CommunityPost.findByIdAndDelete(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
     res.json({ deleted: true });
 });
 
 // Unflag a community post
-app.post('/api/community/:id/unflag', (req, res) => {
+app.post('/api/community/:id/unflag', async (req, res) => {
     const { id } = req.params;
-    const posts = readCommunity();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Post not found' });
-    posts[idx].flagged = false;
-    writeCommunity(posts);
+    const post = await CommunityPost.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.flagged = false;
+    await post.save();
     res.json({ flagged: false });
 });
 
 // Delete a comment on a community post
-app.delete('/api/community/:postId/comments/:commentId', (req, res) => {
+app.delete('/api/community/:postId/comments/:commentId', async (req, res) => {
     const { postId, commentId } = req.params;
-    const posts = readCommunity();
-    const post = posts.find(p => p.id === postId);
+    const post = await CommunityPost.findById(postId);
     if (!post) return res.status(404).json({ error: 'Post not found' });
-    const idx = (post.comments || []).findIndex(c => c.id === commentId);
+    const idx = post.comments.findIndex(c => c._id.toString() === commentId);
     if (idx === -1) return res.status(404).json({ error: 'Comment not found' });
     post.comments.splice(idx, 1);
-    writeCommunity(posts);
+    await post.save();
     res.json({ deleted: true });
 });
 
 // Unflag a comment on a community post
-app.post('/api/community/:postId/comments/:commentId/unflag', (req, res) => {
+app.post('/api/community/:postId/comments/:commentId/unflag', async (req, res) => {
     const { postId, commentId } = req.params;
-    const posts = readCommunity();
-    const post = posts.find(p => p.id === postId);
+    const post = await CommunityPost.findById(postId);
     if (!post) return res.status(404).json({ error: 'Post not found' });
-    const comment = (post.comments || []).find(c => c.id === commentId);
+    const comment = post.comments.id(commentId) || post.comments.find(c => c._id.toString() === commentId);
     if (!comment) return res.status(404).json({ error: 'Comment not found' });
     comment.flagged = false;
-    writeCommunity(posts);
+    await post.save();
     res.json({ flagged: false });
 });
 
@@ -277,27 +261,21 @@ app.post('/api/auth/signup', async (req, res) => {
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
-    const users = readUsers();
-    if (users.find(u => u.email === email)) {
-        return res.status(400).json({ error: 'Email already registered.' });
+    try {
+        if (await User.findOne({ email })) {
+            return res.status(400).json({ error: 'Email already registered.' });
+        }
+        if (await User.findOne({ username })) {
+            return res.status(400).json({ error: 'Username already taken.' });
+        }
+        const hashed = await bcrypt.hash(password, 10);
+        const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
+        const user = await User.create({ username, email, password: hashed, avatarUrl });
+        const token = jwt.sign({ id: user._id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: user._id, username: user.username, email: user.email, avatarUrl: user.avatarUrl } });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
     }
-    if (users.find(u => u.username === username)) {
-        return res.status(400).json({ error: 'Username already taken.' });
-    }
-    const hashed = await bcrypt.hash(password, 10);
-    // Assign a DiceBear avatar URL (using username as seed)
-    const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
-    const user = {
-        id: Date.now().toString(),
-        username,
-        email,
-        password: hashed,
-        avatarUrl
-    };
-    users.push(user);
-    writeUsers(users);
-    const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl } });
 });
 
 // User login (sign in)
@@ -306,51 +284,52 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password required.' });
     }
-    const users = readUsers();
-    const user = users.find(u => u.email === email);
-    if (!user) return res.status(400).json({ error: 'Invalid credentials.' });
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: 'Invalid credentials.' });
-        const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, verified: user.verified } });
+    try {
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials.' });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(400).json({ error: 'Invalid credentials.' });
+        const token = jwt.sign({ id: user._id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: user._id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, verified: user.verified } });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 
 // Get current user info from token
-app.get('/api/auth/me', (req, res) => {
+app.get('/api/auth/me', async (req, res) => {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
     try {
         const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
-        const users = readUsers();
-        const user = users.find(u => u.id === decoded.id);
+        const user = await User.findById(decoded.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ id: user.id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, profileImage: user.profileImage, bio: user.bio });
+        res.json({ id: user._id, username: user.username, email: user.email, avatarUrl: user.avatarUrl, profileImage: user.profileImage, bio: user.bio });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
     }
 });
 
 // Upload/update profile image
-app.post('/api/auth/profile-image', (req, res) => {
+app.post('/api/auth/profile-image', async (req, res) => {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
     try {
         const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
-        const users = readUsers();
-        const idx = users.findIndex(u => u.id === decoded.id);
-        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
         const { image } = req.body;
         if (!image) {
-            users[idx].profileImage = '';
-            writeUsers(users);
+            user.profileImage = '';
+            await user.save();
             return res.json({ profileImage: '' });
         }
         if (typeof image !== 'string' || !image.startsWith('data:image/')) {
             return res.status(400).json({ error: 'Invalid image data.' });
         }
-        users[idx].profileImage = image;
-        writeUsers(users);
+        user.profileImage = image;
+        await user.save();
         res.json({ profileImage: image });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
@@ -358,24 +337,23 @@ app.post('/api/auth/profile-image', (req, res) => {
 });
 
 // Update username/email
-app.post('/api/auth/update', (req, res) => {
+app.post('/api/auth/update', async (req, res) => {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
     try {
         const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
-        const users = readUsers();
-        const idx = users.findIndex(u => u.id === decoded.id);
-        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
         const { username, email, bio } = req.body;
         if (!username || !email) return res.status(400).json({ error: 'Username and email required.' });
         // Check for duplicate username/email
-        if (users.some((u, i) => i !== idx && u.username === username)) return res.status(400).json({ error: 'Username already taken.' });
-        if (users.some((u, i) => i !== idx && u.email === email)) return res.status(400).json({ error: 'Email already registered.' });
-        users[idx].username = username;
-        users[idx].email = email;
-        if (typeof bio === 'string') users[idx].bio = bio;
-        writeUsers(users);
-        res.json({ username, email, bio: users[idx].bio });
+        if (await User.findOne({ username, _id: { $ne: user._id } })) return res.status(400).json({ error: 'Username already taken.' });
+        if (await User.findOne({ email, _id: { $ne: user._id } })) return res.status(400).json({ error: 'Email already registered.' });
+        user.username = username;
+        user.email = email;
+        if (typeof bio === 'string') user.bio = bio;
+        await user.save();
+        res.json({ username, email, bio: user.bio });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
     }
@@ -387,15 +365,14 @@ app.post('/api/auth/change-password', async (req, res) => {
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No token' });
     try {
         const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
-        const users = readUsers();
-        const idx = users.findIndex(u => u.id === decoded.id);
-        if (idx === -1) return res.status(404).json({ error: 'User not found' });
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
         const { currentPassword, newPassword } = req.body;
         if (!currentPassword || !newPassword) return res.status(400).json({ error: 'All password fields required.' });
-        const match = await bcrypt.compare(currentPassword, users[idx].password);
+        const match = await bcrypt.compare(currentPassword, user.password);
         if (!match) return res.status(400).json({ error: 'Current password is incorrect.' });
-        users[idx].password = await bcrypt.hash(newPassword, 10);
-        writeUsers(users);
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
         res.json({ changed: true });
     } catch {
         res.status(401).json({ error: 'Invalid token' });
