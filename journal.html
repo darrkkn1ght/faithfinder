@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithFinder Journal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .journal-section { max-width: 800px; margin: 2rem auto; background: var(--bg-card); border-radius: 1rem; box-shadow: var(--shadow); padding: 2rem; }
+        .journal-section h2 { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <section class="journal-section">
+        <h2><i class="fas fa-book"></i> My Journal</h2>
+        <div id="journalList">
+            <!-- Saved verses and notes will be rendered here -->
+        </div>
+        <div style="margin-top:2rem;">
+            <a href="index.html" class="secondary-btn"><i class="fas fa-home"></i> Back to FaithFinder</a>
+        </div>
+    </section>
+    <script>
+    function renderJournal() {
+        const journalList = document.getElementById('journalList');
+        let savedVerses = [];
+        try {
+            savedVerses = JSON.parse(localStorage.getItem('savedVerses') || '[]');
+        } catch (e) {
+            savedVerses = [];
+        }
+        if (!savedVerses.length) {
+            journalList.innerHTML = '<p style="color:var(--text-secondary);">No saved verses yet. Save a verse to start your journal.</p>';
+            return;
+        }
+        journalList.innerHTML = savedVerses.map((verse, idx) => `
+            <div class="verse-card" style="margin-bottom:1.5rem;">
+                <div class="verse-text">"${verse.text}"</div>
+                <div class="verse-reference">${verse.reference}</div>
+                <div style="color:var(--text-secondary); font-size:0.95em; margin-bottom:0.5rem;">Saved: ${verse.savedAt ? new Date(verse.savedAt).toLocaleString() : ''}</div>
+                <textarea class="journal-note" data-idx="${idx}" placeholder="Add your personal note..." style="width:100%;min-height:60px;resize:vertical;">${verse.note || ''}</textarea>
+                <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+                    <button class="secondary-btn" onclick="saveJournalNote(${idx})"><i class="fas fa-save"></i> Save Note</button>
+                    <button class="secondary-btn" onclick="deleteJournalVerse(${idx})"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    function saveJournalNote(idx) {
+        let savedVerses = [];
+        try {
+            savedVerses = JSON.parse(localStorage.getItem('savedVerses') || '[]');
+        } catch (e) {
+            savedVerses = [];
+        }
+        const noteEl = document.querySelector(`textarea.journal-note[data-idx="${idx}"]`);
+        if (noteEl) {
+            savedVerses[idx].note = noteEl.value;
+            localStorage.setItem('savedVerses', JSON.stringify(savedVerses));
+            alert('Note saved!');
+        }
+    }
+    function deleteJournalVerse(idx) {
+        let savedVerses = [];
+        try {
+            savedVerses = JSON.parse(localStorage.getItem('savedVerses') || '[]');
+        } catch (e) {
+            savedVerses = [];
+        }
+        savedVerses.splice(idx, 1);
+        localStorage.setItem('savedVerses', JSON.stringify(savedVerses));
+        renderJournal();
+        alert('Verse removed from journal.');
+    }
+    document.addEventListener('DOMContentLoaded', renderJournal);
+    </script>
+</body>
+</html>

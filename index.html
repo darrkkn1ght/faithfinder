@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithFinder - Find Hope in Scripture</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-dove"></i>
+                <h1>FaithFinder</h1>
+            </div>
+            <div class="nav-controls">
+                <a href="journal.html" id="journalLink" class="control-btn" title="Journal" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-book"></i>
+                </a>
+<<<<<<< HEAD
+=======
+                <a href="prayer.html" id="prayerLink" class="control-btn" title="Prayer Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-hands"></i>
+                </a>
+>>>>>>> ce6c3de (Add Prayer Wall page and update naviagtion)
+                <button id="settingsBtn" class="control-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="themeToggle" class="control-btn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>Settings</h3>
+                <button id="closeSettings" class="close-btn">&times;</button>
+            </div>
+            <div class="setting-group">
+                <label for="themeSelect">Color Theme:</label>
+                <select id="themeSelect">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="sepia">Sepia</option>
+                    <option value="high-contrast">High Contrast</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label for="fontFamily">Font Style:</label>
+                <select id="fontFamily">
+                    <option value="Georgia, serif">Georgia (Serif)</option>
+                    <option value="Arial, sans-serif">Arial (Sans-serif)</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="'Crimson Text', serif">Crimson Text</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label><input type="checkbox" id="dyslexiaFont"> Dyslexia-Friendly Font</label>
+            </div>
+            <div class="setting-group">
+                <label for="fontSize">Font Size:</label>
+                <input type="range" id="fontSize" min="14" max="24" value="16">
+                <span id="fontSizeValue">16px</span>
+            </div>
+            <div class="setting-group">
+                <label for="lineSpacing">Line Spacing:</label>
+                <input type="range" id="lineSpacing" min="1" max="2" step="0.05" value="1.6">
+                <span id="lineSpacingValue">1.6</span>
+            </div>
+            <div class="setting-group">
+                <label for="dailyReminderToggle">
+                    <input type="checkbox" id="dailyReminderToggle"> Enable Daily Verse Reminder
+                </label>
+                <div id="reminderTimeGroup" style="display:none; margin-top:0.5rem;">
+                    <label for="reminderTime">Reminder Time:</label>
+                    <input type="time" id="reminderTime" value="08:00">
+                </div>
+                <div id="reminderStatus" style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.95em;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Find Hope and Guidance in Scripture</h2>
+                <p>Discover Bible verses, prayers, and inspiration for your current situation</p>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+    <input type="text" id="searchInput" placeholder="How are you feeling? (e.g., anxious, grateful, lonely...)">
+    <button id="voiceSearchBtn" onclick="startVoiceSearch()" title="Voice Search">
+        <i class="fas fa-microphone"></i>
+    </button>
+    <button id="searchBtn">
+        <i class="fas fa-search"></i>
+        Search
+    </button>
+</div>
+                <div class="quick-tags">
+                    <span class="tag" data-emotion="anxiety">Anxiety</span>
+                    <span class="tag" data-emotion="depression">Depression</span>
+                    <span class="tag" data-emotion="gratitude">Gratitude</span>
+                    <span class="tag" data-emotion="loneliness">Loneliness</span>
+                    <span class="tag" data-emotion="fear">Fear</span>
+                    <span class="tag" data-emotion="hope">Hope</span>
+                    <span class="tag" data-emotion="love">Love</span>
+                    <span class="tag" data-emotion="peace">Peace</span>
+                </div>
+            </section>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" class="results-container">
+                <!-- Daily Verse (shown by default) -->
+                <section class="daily-verse">
+                    <h3><i class="fas fa-sun"></i> Verse of the Day</h3>
+                    <div class="verse-card">
+                        <div class="verse-text">
+                            "For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you, plans to give you hope and a future."
+                        </div>
+                        <div class="verse-reference">Jeremiah 29:11 (NIV)</div>
+                        <div class="verse-context">
+                            <h4>Context:</h4>
+                            <p>This verse was written during a time when the Israelites were in exile in Babylon. God was reassuring them through the prophet Jeremiah that despite their current difficult circumstances, He had not forgotten them and had good plans for their future.</p>
+                        </div>
+                        <button class="refresh-btn secondary-btn" id="refreshVerseBtn" aria-label="Get a new daily verse">
+                            <i class="fas fa-sync-alt"></i> New Verse
+                        </button>
+                        <div class="verse-share-group">
+                            <button class="share-btn" id="shareDailyWhatsapp" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                            <button class="share-btn" id="shareDailyFacebook" title="Share on Facebook"><i class="fab fa-facebook"></i></button>
+                            <button class="share-btn" id="shareDailyTwitter" title="Share on Twitter"><i class="fab fa-twitter"></i></button>
+                            <button class="share-btn" id="shareDailyEmail" title="Share by Email"><i class="fas fa-envelope"></i></button>
+                            <button class="share-btn" id="downloadDailyImage" title="Download as Image"><i class="fas fa-image"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Search Results will be inserted here -->
+            </div>
+
+            <!-- Inspirational Quote Section -->
+            <section class="quote-section">
+                <h3><i class="fas fa-quote-left"></i> Daily Inspiration</h3>
+                <div class="quote-card">
+                    <div class="quote-text" id="dailyQuote">
+                        "Faith is taking the first step even when you don't see the whole staircase."
+                    </div>
+                    <div class="quote-author" id="quoteAuthor">- Martin Luther King Jr.</div>
+                    <button id="newQuoteBtn" class="secondary-btn">New Quote</button>
+                </div>
+            </section>
+                    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 FaithFinder. May God bless your journey.</p>
+            <div class="footer-links">
+                <a href="#" onclick="showAbout()">About</a>
+                <a href="#" onclick="showContact()">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
