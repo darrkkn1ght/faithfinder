@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - FaithFinder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: var(--font-family, Georgia, serif);
+            color: var(--text-primary, #2d3748);
+        }
+        .auth-section {
+            max-width: 400px;
+            margin: 4rem auto 2rem auto;
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem 2rem 2rem 2rem;
+        }
+        .auth-section h2 {
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        .auth-form label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+            color: var(--primary-color);
+        }
+        .auth-form input {
+            width: 100%;
+            margin-bottom: 1.2rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.7rem;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-card);
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+        .auth-form input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+        .auth-form button[type="submit"] {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: #fff;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 0.7rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.13);
+            transition: background 0.3s, transform 0.2s;
+        }
+        .auth-form button[type="submit"]:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            transform: translateY(-2px) scale(1.03);
+        }
+        #authMsg {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            min-height: 1.2em;
+        }
+        .auth-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+            text-decoration: underline;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <section class="auth-section">
+        <h2><i class="fas fa-sign-in-alt"></i> Sign In</h2>
+        <form class="auth-form" id="loginForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required maxlength="64" autocomplete="email">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required minlength="6" maxlength="64" autocomplete="current-password">
+            <button type="submit"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+            <div id="authMsg"></div>
+        </form>
+        <a href="signup.html" class="auth-link">Don't have an account? Sign Up</a>
+    </section>
+    <script>
+    const API_URL = 'http://localhost:3001/api/auth/login';
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const msg = document.getElementById('authMsg');
+        msg.textContent = '';
+        msg.style.color = '';
+        if (!email || !password) {
+            msg.style.color = 'red';
+            msg.textContent = 'Email and password are required.';
+            return;
+        }
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Sign in failed.');
+            localStorage.setItem('faithfinder_token', data.token);
+            localStorage.setItem('faithfinder_user', JSON.stringify(data.user));
+            msg.style.color = 'green';
+            msg.textContent = 'Sign in successful! Redirecting...';
+            setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        } catch (err) {
+            msg.style.color = 'red';
+            msg.textContent = err.message || 'Sign in failed.';
+        }
+    });
+    </script>
+</body>
+</html>

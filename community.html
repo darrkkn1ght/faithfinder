@@ -125,6 +125,111 @@
             line-height: 1.7;
             margin-bottom: 0.5rem;
         }
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.3rem;
+            height: 2.3rem;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-right: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .comment .avatar {
+            width: 1.7rem;
+            height: 1.7rem;
+            font-size: 1.05rem;
+            margin-right: 0.5rem;
+        }
+        .pin-btn {
+            background: none;
+            border: none;
+            color: #f59e42;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-left: 0.7rem;
+            transition: color 0.2s;
+        }
+        .pin-btn:hover {
+            color: #d97706;
+            text-decoration: underline;
+        }
+        .pinned-label {
+            color: #f59e42;
+            font-weight: bold;
+            margin-left: 0.7rem;
+            font-size: 0.98em;
+        }
+        .community-card.pinned {
+            border-left: 8px solid #f59e42 !important;
+            background: linear-gradient(120deg, #fef3c7 80%, var(--bg-secondary) 100%) !important;
+            box-shadow: 0 8px 32px rgba(245, 158, 66, 0.13);
+        }
+        .report-btn {
+            background: none;
+            border: none;
+            color: #b91c1c;
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-left: 0.7rem;
+            transition: color 0.2s;
+        }
+        .report-btn:hover {
+            color: #dc2626;
+            text-decoration: underline;
+        }
+        .flagged-label {
+            color: #b91c1c;
+            font-weight: bold;
+            margin-left: 0.7rem;
+            font-size: 0.98em;
+        }
+        .comment.flagged, .community-card.flagged {
+            background: #fef2f2 !important;
+            opacity: 0.7;
+        }
+        .comment.flagged .comment-message {
+            color: #b91c1c;
+        }
+        .community-card.flagged .community-message {
+            color: #b91c1c;
+        }
+        .community-card.flagged .flagged-label {
+            color: #b91c1c;
+        }
+        .community-card.flagged {
+            border-left-color: #b91c1c !important;
+        }
+        .comment.flagged {
+            border-left: 3px solid #b91c1c;
+        }
+        .like-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+        }
+        .like-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+        }
+        .like-btn.liked, .like-btn:active {
+            color: #c53030;
+            transform: scale(1.2);
+        }
+        .like-count {
+            font-size: 1.05rem;
+            color: #e53e3e;
+            font-weight: 600;
+        }
         /* Comments */
         .comments-section {
             margin-top: 1.2rem;
@@ -200,7 +305,7 @@
 <body>
     <section class="community-section">
         <h2><i class="fas fa-users"></i> Community Wall</h2>
-        <form class="community-form" id="communityForm">
+        <form class="community-form" id="communityForm" style="display:none;">
             <label for="communityType">Type:</label>
             <select id="communityType">
                 <option value="encouragement">Encouragement</option>
@@ -212,6 +317,25 @@
             <button type="submit" class="secondary-btn"><i class="fas fa-paper-plane"></i> Post</button>
             <div id="communityFormMsg"></div>
         </form>
+        <div id="signInPrompt" style="display:none; text-align:center; margin-bottom:2rem;">
+            <a href="login.html" class="secondary-btn" style="font-size:1.1rem;"><i class="fas fa-sign-in-alt"></i> Sign in to post or comment</a>
+        </div>
+        <div style="margin-bottom:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; align-items:center;">
+            <div>
+                <button class="secondary-btn filter-btn" data-filter="all">All</button>
+                <button class="secondary-btn filter-btn" data-filter="encouragement">Encouragement</button>
+                <button class="secondary-btn filter-btn" data-filter="testimony">Testimony</button>
+                <button class="secondary-btn filter-btn" data-filter="answered">Answered</button>
+            </div>
+            <div style="display:inline-block;">
+                <label for="sortSelect" style="font-weight:600; color:var(--primary-color); margin-right:0.5rem;">Sort by:</label>
+                <select id="sortSelect" style="padding:0.5rem 1rem; border-radius:0.5rem; border:1.5px solid var(--border-color); font-size:1rem;">
+                    <option value="newest">Newest</option>
+                    <option value="mostLiked">Most Liked</option>
+                    <option value="mostCommented">Most Commented</option>
+                </select>
+            </div>
+        </div>
         <div class="community-list" id="communityList">
             <!-- Community posts will be loaded here -->
         </div>
@@ -247,28 +371,155 @@
         return res.json();
     }
 
+    async function reportPost(postId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/flag`, { method: 'POST' });
+            btn.textContent = 'Reported';
+            btn.style.color = '#b91c1c';
+            loadCommunity();
+        } catch {
+            btn.textContent = 'Error';
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 1200);
+        }
+    }
+
+    async function reportComment(postId, commentId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/comments/${commentId}/flag`, { method: 'POST' });
+            btn.textContent = 'Reported';
+            btn.style.color = '#b91c1c';
+            loadCommunity();
+        } catch {
+            btn.textContent = 'Error';
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 1200);
+        }
+    }
+
+    async function likePost(postId, btn, countSpan) {
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/${postId}/like`, { method: 'POST' });
+            const data = await res.json();
+            countSpan.textContent = data.likes;
+            btn.classList.add('liked');
+        } catch {
+            // Optionally show error
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 600);
+        }
+    }
+
+    let allCommunityPosts = [];
+    let currentFilter = 'all';
+    let currentSort = 'newest';
+
+    async function pinPost(postId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/pin`, { method: 'POST' });
+            btn.textContent = 'Pinned!';
+            btn.style.color = '#f59e42';
+            loadCommunity();
+        } catch {
+            btn.textContent = 'Error';
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 1200);
+        }
+    }
+    async function unpinPost(postId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/unpin`, { method: 'POST' });
+            btn.textContent = 'Unpinned';
+            btn.style.color = '#f59e42';
+            loadCommunity();
+        } catch {
+            btn.textContent = 'Error';
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 1200);
+        }
+    }
+
+    function renderAvatar(avatar) {
+        if (!avatar) return '';
+        return `<span class="avatar" style="background:${avatar.color};"><i class="fas ${avatar.icon}"></i></span>`;
+    }
+
     function renderCommunity(posts) {
         const communityList = document.getElementById('communityList');
         if (!posts.length) {
             communityList.innerHTML = '<p style="color:var(--text-secondary); text-align:center;">No posts yet. Be the first to share encouragement, a testimony, or an answered prayer!</p>';
             return;
         }
-        communityList.innerHTML = posts.map(post => `
-            <div class="community-card ${post.type}">
+        // Separate pinned post
+        const pinned = posts.find(p => p.pinned);
+        const rest = posts.filter(p => !p.pinned);
+        let html = '';
+        if (pinned) {
+            html += `
+            <div class="community-card ${pinned.type} pinned${pinned.flagged ? ' flagged' : ''}">
                 <div class="community-meta">
+                    ${renderAvatar(pinned.avatar)}
+                    <span class="community-type ${pinned.type}">
+                        ${pinned.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
+                        ${pinned.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
+                        ${pinned.type === 'answered' ? '<i class=\'fas fa-star\'></i>Answered' : ''}
+                    </span>
+                    <span>${new Date(pinned.createdAt).toLocaleString()}</span>
+                    <span class="pinned-label"><i class='fas fa-thumbtack'></i> Pinned</span>
+                    <button class="pin-btn" data-postid="${pinned.id}" data-action="unpin"><i class="fas fa-thumbtack"></i> Unpin</button>
+                    ${pinned.flagged ? '<span class="flagged-label">Flagged</span>' : `<button class="report-btn" data-postid="${pinned.id}"><i class="fas fa-flag"></i> Report</button>`}
+                </div>
+                <div class="like-row">
+                    <button class="like-btn" data-postid="${pinned.id}" title="Like this post"><i class="fas fa-heart"></i></button>
+                    <span class="like-count" id="like-count-${pinned.id}">${pinned.likes || 0}</span>
+                </div>
+                <div class="community-message">${pinned.message.replace(/</g, '&lt;')}</div>
+                <div class="comments-section" id="comments-${pinned.id}">
+                    <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
+                    ${pinned.comments && pinned.comments.length ? pinned.comments.map(comment => `
+                        <div class="comment${comment.flagged ? ' flagged' : ''}">
+                            <div class="comment-meta">${renderAvatar(comment.avatar)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${pinned.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
+                            <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
+                        </div>
+                    `).join('') : '<div style="color:#888;">No comments yet.</div>'}
+                    <form class="comment-form" data-postid="${pinned.id}" onsubmit="return false;">
+                        <input type="text" placeholder="Add a comment..." maxlength="200" required />
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        <span class="comment-msg"></span>
+                    </form>
+                </div>
+            </div>
+            <hr style="margin:2rem 0; border:0; border-top:2px dashed #f59e42;">
+            `;
+        }
+        html += rest.map(post => `
+            <div class="community-card ${post.type}${post.flagged ? ' flagged' : ''}">
+                <div class="community-meta">
+                    ${renderAvatar(post.avatar)}
                     <span class="community-type ${post.type}">
                         ${post.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
                         ${post.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
                         ${post.type === 'answered' ? '<i class=\'fas fa-star\'></i>Answered' : ''}
                     </span>
                     <span>${new Date(post.createdAt).toLocaleString()}</span>
+                    <button class="pin-btn" data-postid="${post.id}" data-action="pin"><i class="fas fa-thumbtack"></i> Pin</button>
+                    ${post.flagged ? '<span class="flagged-label">Flagged</span>' : `<button class="report-btn" data-postid="${post.id}"><i class="fas fa-flag"></i> Report</button>`}
+                </div>
+                <div class="like-row">
+                    <button class="like-btn" data-postid="${post.id}" title="Like this post"><i class="fas fa-heart"></i></button>
+                    <span class="like-count" id="like-count-${post.id}">${post.likes || 0}</span>
                 </div>
                 <div class="community-message">${post.message.replace(/</g, '&lt;')}</div>
                 <div class="comments-section" id="comments-${post.id}">
                     <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
                     ${post.comments && post.comments.length ? post.comments.map(comment => `
-                        <div class="comment">
-                            <div class="comment-meta">${new Date(comment.createdAt).toLocaleString()}</div>
+                        <div class="comment${comment.flagged ? ' flagged' : ''}">
+                            <div class="comment-meta">${renderAvatar(comment.avatar)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${post.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
                             <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
                         </div>
                     `).join('') : '<div style="color:#888;">No comments yet.</div>'}
@@ -280,8 +531,50 @@
                 </div>
             </div>
         `).join('');
+        communityList.innerHTML = html;
+        // Attach pin button handlers
+        document.querySelectorAll('.pin-btn').forEach(btn => {
+            const postId = btn.getAttribute('data-postid');
+            const action = btn.getAttribute('data-action');
+            if (action === 'pin') {
+                btn.onclick = function() { pinPost(postId, btn); };
+            } else {
+                btn.onclick = function() { unpinPost(postId, btn); };
+            }
+        });
+        // Attach report button handlers
+        document.querySelectorAll('.report-btn').forEach(btn => {
+            const postId = btn.getAttribute('data-postid');
+            const commentId = btn.getAttribute('data-commentid');
+            if (commentId) {
+                btn.onclick = function() { reportComment(postId, commentId, btn); };
+            } else {
+                btn.onclick = function() { reportPost(postId, btn); };
+            }
+        });
+        // Attach like button handlers
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.onclick = function() {
+                const postId = btn.getAttribute('data-postid');
+                const countSpan = document.getElementById('like-count-' + postId);
+                likePost(postId, btn, countSpan);
+            };
+        });
         // Attach comment form handlers
         document.querySelectorAll('.comment-form').forEach(form => {
+            // Hide comment form if not logged in
+            if (!localStorage.getItem('faithfinder_user')) {
+                form.style.display = 'none';
+                const parent = form.parentElement;
+                if (parent && !parent.querySelector('.comment-signin')) {
+                    const signInDiv = document.createElement('div');
+                    signInDiv.className = 'comment-signin';
+                    signInDiv.style = 'margin-top:0.5rem;text-align:center;';
+                    signInDiv.innerHTML = '<a href="login.html" class="secondary-btn" style="font-size:0.98rem;"><i class="fas fa-sign-in-alt"></i> Sign in to comment</a>';
+                    parent.appendChild(signInDiv);
+                }
+                return;
+            }
             form.onsubmit = async function(e) {
                 e.preventDefault();
                 const postId = form.getAttribute('data-postid');
@@ -308,14 +601,79 @@
         });
     }
 
+    let pollInterval = null;
     async function loadCommunity() {
         try {
             const posts = await fetchCommunity();
-            renderCommunity(posts);
+            allCommunityPosts = posts;
+            applyFilter();
         } catch {
             document.getElementById('communityList').innerHTML = '<p style="color:red; text-align:center;">Failed to load community posts.</p>';
         }
     }
+
+    function startPolling() {
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(loadCommunity, 4000); // Poll every 4 seconds
+    }
+
+    function applyFilter() {
+        let filtered = allCommunityPosts;
+        if (currentFilter !== 'all') {
+            filtered = allCommunityPosts.filter(p => p.type === currentFilter);
+        }
+        // Sorting
+        let sorted = [...filtered];
+        if (currentSort === 'mostLiked') {
+            sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        } else if (currentSort === 'mostCommented') {
+            sorted.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+        } else {
+            // newest (default)
+            sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+        renderCommunity(sorted);
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            if (btn.getAttribute('data-filter') === currentFilter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        // Set sort select
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) sortSelect.value = currentSort;
+    }
+
+    function showAuthUI() {
+        const user = localStorage.getItem('faithfinder_user');
+        const form = document.getElementById('communityForm');
+        const prompt = document.getElementById('signInPrompt');
+        if (user) {
+            form.style.display = '';
+            prompt.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            prompt.style.display = '';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        showAuthUI();
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = function() {
+                currentFilter = btn.getAttribute('data-filter');
+                applyFilter();
+            };
+        });
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.onchange = function() {
+                currentSort = sortSelect.value;
+                applyFilter();
+            };
+        }
+        startPolling();
+    });
 
     document.getElementById('communityForm').addEventListener('submit', async e => {
         e.preventDefault();

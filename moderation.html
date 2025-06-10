@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithFinder Moderation Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: var(--font-family, Georgia, serif);
+            color: var(--text-primary, #2d3748);
+        }
+        .mod-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem auto;
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem 2rem 2rem 2rem;
+        }
+        .mod-section h2 {
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            color: #b91c1c;
+            letter-spacing: 1px;
+        }
+        .flagged-list {
+            margin-top: 2rem;
+        }
+        .flagged-card {
+            background: #fef2f2;
+            border-left: 6px solid #b91c1c;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 1.7rem;
+            position: relative;
+        }
+        .flagged-meta {
+            color: #b91c1c;
+            font-size: 0.98em;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .flagged-message {
+            font-size: 1.13rem;
+            line-height: 1.7;
+            color: #b91c1c;
+            margin-bottom: 0.5rem;
+        }
+        .mod-btn {
+            background: #fff;
+            color: #b91c1c;
+            border: 2px solid #b91c1c;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 0.7rem;
+            transition: all 0.2s;
+        }
+        .mod-btn:hover {
+            background: #b91c1c;
+            color: #fff;
+        }
+        .mod-comment {
+            background: #fff0f0;
+            border-left: 3px solid #b91c1c;
+            border-radius: 0.5rem;
+            margin: 0.7rem 0 0.7rem 0.7rem;
+            padding: 0.7rem 1rem;
+        }
+        .mod-comment-meta {
+            color: #b91c1c;
+            font-size: 0.93em;
+            margin-bottom: 0.2rem;
+        }
+        .mod-comment-message {
+            color: #b91c1c;
+            font-size: 1.01rem;
+        }
+        @media (max-width: 600px) {
+            .mod-section {
+                padding: 1rem 0.2rem;
+            }
+            .flagged-card {
+                padding: 1rem 0.5rem 0.7rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="mod-section">
+        <h2><i class="fas fa-shield-alt"></i> Moderation Panel</h2>
+        <div class="flagged-list" id="flaggedList">
+            <!-- Flagged posts/comments will be loaded here -->
+        </div>
+        <div style="margin-top:2rem; text-align:center;">
+            <a href="index.html" class="secondary-btn"><i class="fas fa-home"></i> Back to FaithFinder</a>
+        </div>
+    </section>
+    <script>
+    const API_URL = 'http://localhost:3001/api/community';
+
+    async function fetchCommunity() {
+        const res = await fetch(API_URL);
+        return res.json();
+    }
+
+    async function deletePost(postId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}`, { method: 'DELETE' });
+            loadFlagged();
+        } catch {}
+    }
+    async function unflagPost(postId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/unflag`, { method: 'POST' });
+            loadFlagged();
+        } catch {}
+    }
+    async function deleteComment(postId, commentId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/comments/${commentId}`, { method: 'DELETE' });
+            loadFlagged();
+        } catch {}
+    }
+    async function unflagComment(postId, commentId, btn) {
+        btn.disabled = true;
+        try {
+            await fetch(`${API_URL}/${postId}/comments/${commentId}/unflag`, { method: 'POST' });
+            loadFlagged();
+        } catch {}
+    }
+
+    function renderFlagged(posts) {
+        const flaggedList = document.getElementById('flaggedList');
+        const flaggedPosts = posts.filter(p => p.flagged);
+        const flaggedComments = posts.flatMap(p => (p.comments || []).map(c => ({...c, postId: p.id, postType: p.type, postMessage: p.message, postFlagged: p.flagged}))).filter(c => c.flagged);
+        if (!flaggedPosts.length && !flaggedComments.length) {
+            flaggedList.innerHTML = '<p style="color:#b91c1c; text-align:center;">No flagged posts or comments.</p>';
+            return;
+        }
+        let html = '';
+        flaggedPosts.forEach(post => {
+            html += `<div class="flagged-card">
+                <div class="flagged-meta"><i class="fas fa-flag"></i> Flagged Post (${post.type})</div>
+                <div class="flagged-message">${post.message.replace(/</g, '&lt;')}</div>
+                <button class="mod-btn" onclick="deletePost('${post.id}', this)"><i class="fas fa-trash"></i> Delete</button>
+                <button class="mod-btn" onclick="unflagPost('${post.id}', this)"><i class="fas fa-undo"></i> Unflag</button>
+            </div>`;
+        });
+        flaggedComments.forEach(comment => {
+            html += `<div class="flagged-card">
+                <div class="flagged-meta"><i class="fas fa-flag"></i> Flagged Comment (on ${comment.postType})</div>
+                <div class="flagged-message">${comment.message.replace(/</g, '&lt;')}</div>
+                <div class="mod-comment-meta">On post: <span style='font-style:italic;'>${comment.postMessage.replace(/</g, '&lt;')}</span></div>
+                <button class="mod-btn" onclick="deleteComment('${comment.postId}', '${comment.id}', this)"><i class="fas fa-trash"></i> Delete</button>
+                <button class="mod-btn" onclick="unflagComment('${comment.postId}', '${comment.id}', this)"><i class="fas fa-undo"></i> Unflag</button>
+            </div>`;
+        });
+        flaggedList.innerHTML = html;
+    }
+
+    async function loadFlagged() {
+        try {
+            const posts = await fetchCommunity();
+            renderFlagged(posts);
+        } catch {
+            document.getElementById('flaggedList').innerHTML = '<p style="color:red; text-align:center;">Failed to load flagged content.</p>';
+        }
+    }
+
+    loadFlagged();
+    </script>
+</body>
+</html>

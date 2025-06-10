@@ -15,7 +15,7 @@
                 <i class="fas fa-dove"></i>
                 <h1>FaithFinder</h1>
             </div>
-            <div class="nav-controls">
+            <div class="nav-controls" id="navControls">
                 <a href="journal.html" id="journalLink" class="control-btn" title="Journal" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
                     <i class="fas fa-book"></i>
                 </a>
@@ -25,6 +25,7 @@
                 <a href="community.html" id="communityLink" class="control-btn" title="Community Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
                     <i class="fas fa-users"></i>
                 </a>
+                <span id="userStatus" style="display:flex; align-items:center; gap:0.5rem; margin-left:1rem;"></span>
                 <button id="settingsBtn" class="control-btn" title="Settings">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -178,5 +179,31 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+    // Login/logout state display
+    function renderUserStatus() {
+        const userStatus = document.getElementById('userStatus');
+        userStatus.innerHTML = '';
+        const user = localStorage.getItem('faithfinder_user');
+        if (user) {
+            const u = JSON.parse(user);
+            userStatus.innerHTML = `
+                <span style="display:flex;align-items:center;gap:0.4rem;">
+                    <span class="avatar" style="background:${u.avatar.color};width:2rem;height:2rem;font-size:1.1rem;"><i class="fas ${u.avatar.icon}"></i></span>
+                    <span style="font-weight:600;">${u.username}</span>
+                    <button id="logoutBtn" style="margin-left:0.5rem;background:none;border:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </span>
+            `;
+            document.getElementById('logoutBtn').onclick = function() {
+                localStorage.removeItem('faithfinder_token');
+                localStorage.removeItem('faithfinder_user');
+                window.location.reload();
+            };
+        } else {
+            userStatus.innerHTML = `<a href="login.html" style="color:var(--secondary-color);font-weight:600;text-decoration:underline;font-size:1rem;">Sign In</a>`;
+        }
+    }
+    document.addEventListener('DOMContentLoaded', renderUserStatus);
+    </script>
 </body>
 </html>
