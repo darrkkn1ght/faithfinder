@@ -14,7 +14,7 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = 'faithfinder_secret_key'; // Change this in production!
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://darkknight:Peter\_#123@faithfindercluster.dum2hdb.mongodb.net/?retryWrites=true&w=majority&appName=faithfindercluster', {
+mongoose.connect('mongodb+srv://darkknight:Peter_%23123@faithfindercluster.dum2hdb.mongodb.net/?retryWrites=true&w=majority&appName=faithfindercluster', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log('Connected to MongoDB'))
