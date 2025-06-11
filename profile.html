@@ -337,7 +337,7 @@
             <button class="profile-action-btn" onclick="scrollToSection('profilePicSection')"><i class="fas fa-image"></i> Profile Picture</button>
         </div>
         <div class="profile-content">
-            <form class="profile-form profile-card" id="profilePicSection">
+            <form class="profile-form profile-card" id="profilePicSection" autocomplete="off">
                 <div class="profile-card-title"><i class="fas fa-image"></i> Profile Picture</div>
                 <label for="profileImage" class="custom-file-upload"><i class="fas fa-upload"></i> Choose Image</label>
                 <input type="file" id="profileImage" accept="image/*">
@@ -449,12 +449,18 @@
     // Profile image upload
     document.getElementById('profilePicSection').addEventListener('submit', async e => {
         e.preventDefault();
-        if (!user) return;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        if (!user) {
+            submitBtn.disabled = false;
+            return;
+        }
         const msg = document.getElementById('profileMsg');
         msg.textContent = '';
         if (!fileInput.files[0]) {
             msg.style.color = 'red';
             msg.textContent = 'Please select an image.';
+            submitBtn.disabled = false;
             return;
         }
         const reader = new FileReader();
@@ -481,6 +487,7 @@
                 msg.style.color = 'red';
                 msg.textContent = err.message || 'Upload failed.';
             }
+            submitBtn.disabled = false;
         };
         reader.readAsDataURL(fileInput.files[0]);
     });
