@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const DATA_FILE = path.join(__dirname, 'prayer_requests.json');
 const COMMUNITY_FILE = path.join(__dirname, 'community_wall.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
@@ -64,6 +64,13 @@ const CommunityPost = mongoose.model('CommunityPost', communityPostSchema);
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+// Serve static files from the current directory
+app.use(express.static(__dirname));
+
+// Serve entrance.html at root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'entrance.html'));
+});
 
 // Helper to read/write JSON file
 // MongoDB now handles all data, so these are no longer needed.
