@@ -8,10 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a2236 0%, #2563eb 100%);
             min-height: 100vh;
             font-family: var(--font-family, Georgia, serif);
-            color: var(--text-primary, #2d3748);
+            color: var(--text-primary);
+        }
+        .auth-main {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
         }
         .auth-section {
             max-width: 400px;
@@ -26,13 +35,13 @@
             font-size: 2rem;
             font-weight: 700;
             text-align: center;
-            color: var(--primary-color);
+            color: var(--secondary-color);
         }
         .auth-form label {
             font-weight: 600;
             margin-bottom: 0.25rem;
             display: block;
-            color: var(--primary-color);
+            color: var(--secondary-color);
         }
         .auth-form input {
             width: 100%;
@@ -40,7 +49,7 @@
             padding: 0.85rem 1rem;
             border-radius: 0.7rem;
             border: 1.5px solid var(--border-color);
-            background: var(--bg-card);
+            background: var(--bg-primary);
             font-size: 1.05rem;
             color: var(--text-primary);
             transition: border-color 0.3s;
@@ -58,7 +67,7 @@
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.13);
+            box-shadow: var(--shadow);
             transition: background 0.3s, transform 0.2s;
         }
         .auth-form button[type="submit"]:hover {
@@ -81,23 +90,39 @@
     </style>
 </head>
 <body>
-    <section class="auth-section">
-        <h2><i class="fas fa-user-plus"></i> Sign Up</h2>
-        <form class="auth-form" id="signupForm">
-            <label for="username">Username:</label>
-            <input type="text" id="username" required maxlength="32" autocomplete="username">
-            <label for="email">Email:</label>
-            <input type="email" id="email" required maxlength="64" autocomplete="email">
-            <label for="password">Password:</label>
-            <input type="password" id="password" required minlength="6" maxlength="64" autocomplete="new-password">
-            <button type="submit"><i class="fas fa-user-plus"></i> Sign Up</button>
-            <div id="authMsg"></div>
-        </form>
-        <a href="login.html" class="auth-link">Already have an account? Sign In</a>
-    </section>
+    <!-- FaithFinder Header for consistency -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-dove"></i>
+                <h1>FaithFinder</h1>
+            </div>
+        </div>
+    </header>
+    <main class="auth-main">
+        <section class="auth-section">
+            <h2><i class="fas fa-user-plus"></i> Sign Up</h2>
+            <form class="auth-form" id="signupForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required maxlength="32" autocomplete="username">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required maxlength="64" autocomplete="email">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required minlength="6" maxlength="64" autocomplete="new-password">
+                <button type="submit"><i class="fas fa-user-plus"></i> Sign Up</button>
+                <div id="authMsg"></div>
+                <div id="loadingSpinner" style="display:none;text-align:center;margin-top:1em;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2em;color:#764ba2;"></i>
+                </div>
+            </form>
+            <a href="login.html" class="auth-link">Already have an account? Sign In</a>
+        </section>
+    </main>
     <script>
     const API_URL = 'https://faithfinder.onrender.com/api/auth/signup';
-    document.getElementById('signupForm').addEventListener('submit', async e => {
+    const signupForm = document.getElementById('signupForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    signupForm.addEventListener('submit', async e => {
         e.preventDefault();
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -105,7 +130,9 @@
         const msg = document.getElementById('authMsg');
         msg.textContent = '';
         msg.style.color = '';
+        loadingSpinner.style.display = 'block';
         if (!username || !email || !password) {
+            loadingSpinner.style.display = 'none';
             msg.style.color = 'red';
             msg.textContent = 'All fields are required.';
             return;
@@ -117,6 +144,7 @@
                 body: JSON.stringify({ username, email, password })
             });
             const data = await res.json();
+            loadingSpinner.style.display = 'none';
             if (!res.ok) throw new Error(data.error || 'Sign up failed.');
             localStorage.setItem('faithfinder_token', data.token);
             localStorage.setItem('faithfinder_user', JSON.stringify(data.user));
@@ -124,6 +152,7 @@
             msg.textContent = 'Sign up successful! Redirecting...';
             setTimeout(() => { window.location.href = 'index.html'; }, 2200);
         } catch (err) {
+            loadingSpinner.style.display = 'none';
             msg.style.color = 'red';
             msg.textContent = err.message || 'Sign up failed.';
         }

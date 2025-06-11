@@ -6,344 +6,190 @@
     <title>FaithFinder Community Wall</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Modern toggle switch CSS -->
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: var(--font-family, Georgia, serif);
-            color: var(--text-primary, #2d3748);
-        }
-        .community-section {
-            max-width: 700px;
-            margin: 3rem auto 2rem auto;
-            background: var(--bg-card);
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow-lg);
-            padding: 2.5rem 2rem 2rem 2rem;
-            position: relative;
-        }
-        .community-section h2 {
-            margin-bottom: 2rem;
-            font-size: 2.2rem;
-            font-weight: 700;
-            text-align: center;
-            color: var(--primary-color);
-            letter-spacing: 1px;
-        }
-        .community-form {
-            margin-bottom: 2.5rem;
-            background: var(--bg-secondary);
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-            padding: 1.5rem 1rem 1rem 1rem;
-        }
-        .community-form label {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            display: block;
-            color: var(--primary-color);
-        }
-        .community-form select,
-        .community-form textarea {
-            width: 100%;
-            margin-bottom: 1.2rem;
-            padding: 0.85rem 1rem;
-            border-radius: 0.7rem;
-            border: 1.5px solid var(--border-color);
-            background: var(--bg-card);
-            font-size: 1.05rem;
-            color: var(--text-primary);
-            transition: border-color 0.3s;
-        }
-        .community-form select:focus,
-        .community-form textarea:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-        }
-        .community-form button[type="submit"] {
-            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-            color: #fff;
-            border: none;
-            padding: 0.9rem 2.2rem;
-            border-radius: 0.7rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.13);
-            transition: background 0.3s, transform 0.2s;
-        }
-        .community-form button[type="submit"]:hover {
-            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
-            transform: translateY(-2px) scale(1.03);
-        }
-        #communityFormMsg {
-            margin-top: 0.5rem;
-            font-size: 1rem;
-            min-height: 1.2em;
-        }
-        .community-list {
-            margin-top: 2rem;
-        }
-        .community-card {
-            border-left: 6px solid var(--secondary-color);
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
-            margin-bottom: 1.7rem;
-            position: relative;
-            background: linear-gradient(120deg, var(--bg-secondary) 80%, #e0e7ff 100%);
-            transition: box-shadow 0.2s;
-        }
-        .community-card.encouragement { border-left-color: #22c55e; }
-        .community-card.testimony { border-left-color: #2563eb; }
-        .community-card.answered { border-left-color: #f59e42; }
-        .community-card:hover {
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.18);
-        }
-        .community-meta {
-            color: var(--text-secondary);
-            font-size: 0.98em;
-            margin-bottom: 0.7rem;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-        }
-        .community-type {
-            font-weight: bold;
-            text-transform: capitalize;
-            padding: 0.2em 0.7em;
-            border-radius: 1em;
-            font-size: 0.95em;
-            margin-right: 0.7em;
-        }
-        .community-type.encouragement { background: #dcfce7; color: #166534; }
-        .community-type.testimony { background: #dbeafe; color: #1e40af; }
-        .community-type.answered { background: #fef3c7; color: #b45309; }
-        .community-card .community-type i { margin-right: 0.3em; }
-        .community-card .community-message {
-            font-size: 1.13rem;
-            line-height: 1.7;
-            margin-bottom: 0.5rem;
-        }
-        .avatar {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.3rem;
-            height: 2.3rem;
-            border-radius: 50%;
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-right: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        }
-        .comment .avatar {
-            width: 1.7rem;
-            height: 1.7rem;
-            font-size: 1.05rem;
-            margin-right: 0.5rem;
-        }
-        .pin-btn {
-            background: none;
-            border: none;
-            color: #f59e42;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-left: 0.7rem;
-            transition: color 0.2s;
-        }
-        .pin-btn:hover {
-            color: #d97706;
-            text-decoration: underline;
-        }
-        .pinned-label {
-            color: #f59e42;
-            font-weight: bold;
-            margin-left: 0.7rem;
-            font-size: 0.98em;
-        }
-        .community-card.pinned {
-            border-left: 8px solid #f59e42 !important;
-            background: linear-gradient(120deg, #fef3c7 80%, var(--bg-secondary) 100%) !important;
-            box-shadow: 0 8px 32px rgba(245, 158, 66, 0.13);
-        }
-        .report-btn {
-            background: none;
-            border: none;
-            color: #b91c1c;
-            font-size: 1.05rem;
-            cursor: pointer;
-            margin-left: 0.7rem;
-            transition: color 0.2s;
-        }
-        .report-btn:hover {
-            color: #dc2626;
-            text-decoration: underline;
-        }
-        .flagged-label {
-            color: #b91c1c;
-            font-weight: bold;
-            margin-left: 0.7rem;
-            font-size: 0.98em;
-        }
-        .comment.flagged, .community-card.flagged {
-            background: #fef2f2 !important;
-            opacity: 0.7;
-        }
-        .comment.flagged .comment-message {
-            color: #b91c1c;
-        }
-        .community-card.flagged .community-message {
-            color: #b91c1c;
-        }
-        .community-card.flagged .flagged-label {
-            color: #b91c1c;
-        }
-        .community-card.flagged {
-            border-left-color: #b91c1c !important;
-        }
-        .comment.flagged {
-            border-left: 3px solid #b91c1c;
-        }
-        .like-row {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.7rem;
-        }
-        .like-btn {
-            background: none;
-            border: none;
-            color: #e53e3e;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-        }
-        .like-btn.liked, .like-btn:active {
-            color: #c53030;
-            transform: scale(1.2);
-        }
-        .like-count {
-            font-size: 1.05rem;
-            color: #e53e3e;
-            font-weight: 600;
-        }
-        /* Comments */
-        .comments-section {
-            margin-top: 1.2rem;
-            background: #f7fafc;
-            border-radius: 0.7rem;
-            padding: 1rem 0.8rem 0.7rem 0.8rem;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.07);
-        }
-        .comment {
-            margin-bottom: 0.7rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .comment:last-child {
-            border-bottom: none;
-        }
-        .comment-meta {
-            color: #888;
-            font-size: 0.93em;
-            margin-bottom: 0.2rem;
-        }
-        .comment-message {
-            font-size: 1.01rem;
-            color: var(--text-primary);
-        }
-        .comment-form {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.7rem;
-        }
-        .comment-form input[type="text"] {
-            flex: 1;
-            padding: 0.5rem 0.8rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-            font-size: 1rem;
-        }
-        .comment-form button {
-            background: var(--secondary-color);
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.5rem 1.1rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .comment-form button:hover {
-            background: var(--accent-color);
-        }
-        .comment-form .comment-msg {
-            font-size: 0.95em;
-            margin-left: 0.5rem;
-            color: #b91c1c;
-            align-self: center;
-        }
-        @media (max-width: 600px) {
-            .community-section {
-                padding: 1rem 0.2rem;
-            }
-            .community-form {
-                padding: 1rem 0.3rem 0.7rem 0.3rem;
-            }
-            .community-card {
-                padding: 1rem 0.5rem 0.7rem 0.7rem;
-            }
-            .comments-section {
-                padding: 0.7rem 0.3rem 0.5rem 0.3rem;
-            }
-        }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(80,112,255,0.10);
+    }
+    input:checked + .slider {
+      background: linear-gradient(90deg, var(--secondary-color) 60%, var(--accent-color) 100%);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
     </style>
 </head>
 <body>
-    <section class="community-section">
-        <h2><i class="fas fa-users"></i> Community Wall</h2>
-        <form class="community-form" id="communityForm" style="display:none;">
-            <label for="communityType">Type:</label>
-            <select id="communityType">
-                <option value="encouragement">Encouragement</option>
-                <option value="testimony">Testimony</option>
-                <option value="answered">Answered Prayer</option>
-            </select>
-            <label for="communityMessage">Your Message:</label>
-            <textarea id="communityMessage" rows="3" maxlength="500" required placeholder="Share encouragement, a testimony, or an answered prayer..."></textarea>
-            <button type="submit" class="secondary-btn"><i class="fas fa-paper-plane"></i> Post</button>
-            <div id="communityFormMsg"></div>
-        </form>
-        <div id="signInPrompt" style="display:none; text-align:center; margin-bottom:2rem;">
-            <a href="login.html" class="secondary-btn" style="font-size:1.1rem;"><i class="fas fa-sign-in-alt"></i> Sign in to post or comment</a>
-        </div>
-        <div style="margin-bottom:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; align-items:center;">
-            <div>
-                <button class="secondary-btn filter-btn" data-filter="all">All</button>
-                <button class="secondary-btn filter-btn" data-filter="encouragement">Encouragement</button>
-                <button class="secondary-btn filter-btn" data-filter="testimony">Testimony</button>
-                <button class="secondary-btn filter-btn" data-filter="answered">Answered</button>
+    <div class="particles-bg"></div>
+    <!-- FaithFinder Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-dove"></i>
+                <h1>FaithFinder</h1>
             </div>
-            <div style="display:inline-block;">
-                <label for="sortSelect" style="font-weight:600; color:var(--primary-color); margin-right:0.5rem;">Sort by:</label>
-                <select id="sortSelect" style="padding:0.5rem 1rem; border-radius:0.5rem; border:1.5px solid var(--border-color); font-size:1rem;">
-                    <option value="newest">Newest</option>
-                    <option value="mostLiked">Most Liked</option>
-                    <option value="mostCommented">Most Commented</option>
+            <div class="nav-controls" id="navControls">
+                <a href="journal.html" id="journalLink" class="control-btn" title="Journal" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-book"></i>
+                </a>
+                <a href="prayer.html" id="prayerLink" class="control-btn" title="Prayer Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-hands"></i>
+                </a>
+                <a href="community.html" id="communityLink" class="control-btn" title="Community Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-users"></i>
+                </a>
+                                <button id="settingsBtn" class="control-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="themeToggle" class="control-btn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3><i class="fas fa-sliders-h" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Settings</h3>
+                <button id="closeSettings" class="close-btn" title="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="setting-group">
+                <label for="themeSelect"><i class="fas fa-palette" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Color Theme</label>
+                <select id="themeSelect">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="sepia">Sepia</option>
+                    <option value="high-contrast">High Contrast</option>
                 </select>
             </div>
+            <div class="setting-group">
+                <label for="fontFamily"><i class="fas fa-font" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Style</label>
+                <select id="fontFamily">
+                    <option value="Georgia, serif">Georgia (Serif)</option>
+                    <option value="Arial, sans-serif">Arial (Sans-serif)</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="'Crimson Text', serif">Crimson Text</option>
+                </select>
+            </div>
+            <div class="setting-group" style="display:flex;align-items:center;gap:0.7rem;">
+                <label for="dyslexiaFont" style="margin:0;display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                    <i class="fas fa-universal-access" style="color:var(--secondary-color);"></i>
+                    Dyslexia-Friendly Font
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dyslexiaFont">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-group">
+                <label for="fontSize"><i class="fas fa-text-height" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Size</label>
+                <input type="range" id="fontSize" min="14" max="24" value="16">
+                <span id="fontSizeValue">16px</span>
+            </div>
+            <div class="setting-group">
+                <label for="lineSpacing"><i class="fas fa-arrows-alt-v" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Line Spacing</label>
+                <input type="range" id="lineSpacing" min="1" max="2" step="0.05" value="1.6">
+                <span id="lineSpacingValue">1.6</span>
+            </div>
+            <div class="setting-group">
+                <label for="dailyReminderToggle" style="display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-bell" style="color:var(--secondary-color);"></i>
+                    Enable Daily Verse Reminder
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dailyReminderToggle">
+                    <span class="slider round"></span>
+                </label>
+                <div id="reminderTimeGroup" style="display:none; margin-top:0.5rem;">
+                    <label for="reminderTime"><i class="fas fa-clock" style="margin-right:0.3rem;color:var(--secondary-color);"></i>Reminder Time</label>
+                    <input type="time" id="reminderTime" value="08:00">
+                </div>
+                <div id="reminderStatus" style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.95em;"></div>
+            </div>
         </div>
-        <div class="community-list" id="communityList">
-            <!-- Community posts will be loaded here -->
+    </div>
+    <main class="main-content">
+        <div class="container">
+            <section class="community-section" style="background:var(--bg-card); box-shadow:var(--shadow-lg); border-radius:1.5rem; margin:3rem auto 2rem auto; max-width:700px; position:relative; padding:2.5rem 2rem 2rem 2rem;">
+                <h2 style="font-size:2.5rem; font-weight:300; text-align:center; color:var(--text-primary); margin-bottom:2rem; letter-spacing:0.01em;">
+                    <i class="fas fa-users" style="color:var(--secondary-color);"></i> Community Wall
+                </h2>
+                <form class="community-form" id="communityForm" style="display:none; background:var(--bg-secondary); border-radius:1rem; box-shadow:var(--shadow); padding:1.5rem 1rem 1rem 1rem; margin-bottom:2.5rem;">
+                    <label for="communityType" style="font-weight:600; color:var(--text-secondary); margin-bottom:0.25rem; display:block;">Type:</label>
+                    <select id="communityType" style="width:100%; margin-bottom:1.2rem; padding:0.85rem 1rem; border-radius:0.7rem; border:1.5px solid var(--border-color); background:var(--bg-card); font-size:1.05rem; color:var(--text-primary);">
+                        <option value="encouragement">Encouragement</option>
+                        <option value="testimony">Testimony</option>
+                        <option value="answered">Answered Prayer</option>
+                    </select>
+                    <label for="communityMessage" style="font-weight:600; color:var(--text-secondary); margin-bottom:0.25rem; display:block;">Your Message:</label>
+                    <textarea id="communityMessage" rows="3" maxlength="500" required placeholder="Share encouragement, a testimony, or an answered prayer..." style="width:100%; margin-bottom:1.2rem; padding:0.85rem 1rem; border-radius:0.7rem; border:1.5px solid var(--border-color); background:var(--bg-card); font-size:1.05rem; color:var(--text-primary);"></textarea>
+                    <button type="submit" class="secondary-btn" style="background:linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color:#fff; border:none; padding:0.9rem 2.2rem; border-radius:0.7rem; font-size:1.1rem; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(102,126,234,0.13); transition:background 0.3s, transform 0.2s; display:flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-paper-plane"></i> Post
+                    </button>
+                    <div id="communityFormMsg" style="margin-top:0.5rem; font-size:1rem; min-height:1.2em;"></div>
+                </form>
+                <div id="signInPrompt" style="display:none; text-align:center; margin-bottom:2rem;">
+                    <a href="login.html" class="secondary-btn" style="font-size:1.1rem;"><i class="fas fa-sign-in-alt"></i> Sign in to post or comment</a>
+                </div>
+                <div style="margin-bottom:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; align-items:center;">
+                    <div>
+                        <button class="tag filter-btn" data-filter="all">All</button>
+                        <button class="tag filter-btn" data-filter="encouragement">Encouragement</button>
+                        <button class="tag filter-btn" data-filter="testimony">Testimony</button>
+                        <button class="tag filter-btn" data-filter="answered">Answered</button>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label for="sortSelect" style="font-weight:600; color:var(--text-secondary); margin-right:0.5rem;">Sort by:</label>
+                        <select id="sortSelect" style="padding:0.5rem 1rem; border-radius:0.5rem; border:1.5px solid var(--border-color); font-size:1rem; background:var(--bg-secondary); color:var(--text-primary);">
+                            <option value="newest">Newest</option>
+                            <option value="mostLiked">Most Liked</option>
+                            <option value="mostCommented">Most Commented</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="community-list" id="communityList">
+                    <!-- Community posts will be loaded here -->
+                </div>
+                <div style="margin-top:2rem; text-align:center;">
+                    <a href="index.html" class="secondary-btn" style="background:linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color:#fff; border:none; padding:0.9rem 2.2rem; border-radius:0.7rem; font-size:1.1rem; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(102,126,234,0.13); display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-home"></i> Back to FaithFinder
+                    </a>
+                </div>
+            </section>
         </div>
-        <div style="margin-top:2rem; text-align:center;">
-            <a href="index.html" class="secondary-btn"><i class="fas fa-home"></i> Back to FaithFinder</a>
-        </div>
-    </section>
+    </main>
+    <script src="script.js"></script>
+    <script src="settings.js"></script>
     <script>
+    // --- Community Wall JS (same as before, unchanged) ---
     const API_URL = 'https://faithfinder.onrender.com/api/community';
 
     async function fetchCommunity() {
@@ -464,36 +310,36 @@
         let html = '';
         if (pinned) {
             html += `
-            <div class="community-card ${pinned.type} pinned${pinned.flagged ? ' flagged' : ''}">
-                <div class="community-meta">
+            <div class="community-card ${pinned.type} pinned${pinned.flagged ? ' flagged' : ''}" style="background:var(--bg-secondary); border-radius:1rem; box-shadow:var(--shadow); padding:1.5rem 1.2rem 1.2rem 1.2rem; margin-bottom:1.7rem; position:relative; border-left:8px solid #f59e42;">
+                <div class="community-meta" style="color:var(--text-secondary); font-size:0.98em; margin-bottom:0.7rem; display:flex; align-items:center; gap:0.7rem;">
                     ${renderAvatar(pinned.avatar, pinned.avatarUrl)}
-                    <span class="community-type ${pinned.type}">
+                    <span class="community-type ${pinned.type}" style="font-weight:bold; text-transform:capitalize; padding:0.2em 0.7em; border-radius:1em; font-size:0.95em; margin-right:0.7em; background:var(--bg-card); color:var(--secondary-color);">
                         ${pinned.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
                         ${pinned.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
                         ${pinned.type === 'answered' ? '<i class=\'fas fa-star\'></i>Answered' : ''}
                     </span>
                     <span>${new Date(pinned.createdAt).toLocaleString()}</span>
-                    <span class="pinned-label"><i class='fas fa-thumbtack'></i> Pinned</span>
-                    <button class="pin-btn" data-postid="${pinned.id}" data-action="unpin"><i class="fas fa-thumbtack"></i> Unpin</button>
-                    ${pinned.flagged ? '<span class="flagged-label">Flagged</span>' : `<button class="report-btn" data-postid="${pinned.id}"><i class="fas fa-flag"></i> Report</button>`}
+                    <span class="pinned-label" style="color:#f59e42; font-weight:bold; margin-left:0.7rem; font-size:0.98em;"><i class='fas fa-thumbtack'></i> Pinned</span>
+                    <button class="pin-btn" data-postid="${pinned.id}" data-action="unpin" style="background:none; border:none; color:#f59e42; font-size:1.1rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;"><i class="fas fa-thumbtack"></i> Unpin</button>
+                    ${pinned.flagged ? '<span class="flagged-label" style="color:#b91c1c; font-weight:bold; margin-left:0.7rem; font-size:0.98em;">Flagged</span>' : `<button class="report-btn" data-postid="${pinned.id}" style="background:none; border:none; color:#b91c1c; font-size:1.05rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;"><i class="fas fa-flag"></i> Report</button>`}
                 </div>
-                <div class="like-row">
-                    <button class="like-btn" data-postid="${pinned.id}" title="Like this post"><i class="fas fa-heart"></i></button>
-                    <span class="like-count" id="like-count-${pinned.id}">${pinned.likes || 0}</span>
+                <div class="like-row" style="display:flex; align-items:center; gap:0.7rem; margin-bottom:0.7rem;">
+                    <button class="like-btn" data-postid="${pinned.id}" title="Like this post" style="background:none; border:none; color:#e53e3e; font-size:1.3rem; cursor:pointer; transition:transform 0.1s; display:flex; align-items:center;"><i class="fas fa-heart"></i></button>
+                    <span class="like-count" id="like-count-${pinned.id}" style="font-size:1.05rem; color:#e53e3e; font-weight:600;">${pinned.likes || 0}</span>
                 </div>
-                <div class="community-message">${pinned.message.replace(/</g, '&lt;')}</div>
-                <div class="comments-section" id="comments-${pinned.id}">
+                <div class="community-message" style="font-size:1.13rem; line-height:1.7; margin-bottom:0.5rem; color:var(--text-primary);">${pinned.message.replace(/</g, '&lt;')}</div>
+                <div class="comments-section" id="comments-${pinned.id}" style="margin-top:1.2rem; background:var(--bg-card); border-radius:0.7rem; padding:1rem 0.8rem 0.7rem 0.8rem; box-shadow:0 2px 8px rgba(102,126,234,0.07);">
                     <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
                     ${pinned.comments && pinned.comments.length ? pinned.comments.map(comment => `
-                        <div class="comment${comment.flagged ? ' flagged' : ''}">
-                            <div class="comment-meta">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${pinned.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
-                            <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
+                        <div class="comment${comment.flagged ? ' flagged' : ''}" style="margin-bottom:0.7rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-color);">
+                            <div class="comment-meta" style="color:var(--text-secondary); font-size:0.93em; margin-bottom:0.2rem;">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\' style=\'color:#b91c1c; font-weight:bold; margin-left:0.7rem; font-size:0.98em;\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${pinned.id}\' data-commentid=\'${comment.id}\' style=\'background:none; border:none; color:#b91c1c; font-size:1.05rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
+                            <div class="comment-message" style="font-size:1.01rem; color:var(--text-primary);">${comment.message.replace(/</g, '&lt;')}</div>
                         </div>
                     `).join('') : '<div style="color:#888;">No comments yet.</div>'}
-                    <form class="comment-form" data-postid="${pinned.id}" onsubmit="return false;">
-                        <input type="text" placeholder="Add a comment..." maxlength="200" required />
-                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                        <span class="comment-msg"></span>
+                    <form class="comment-form" data-postid="${pinned.id}" onsubmit="return false;" style="display:flex; gap:0.5rem; margin-top:0.7rem;">
+                        <input type="text" placeholder="Add a comment..." maxlength="200" required style="flex:1; padding:0.5rem 0.8rem; border-radius:0.5rem; border:1px solid var(--border-color); font-size:1rem; background:var(--bg-secondary); color:var(--text-primary);" />
+                        <button type="submit" style="background:linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color:#fff; border:none; border-radius:0.5rem; padding:0.5rem 1.1rem; font-size:1rem; cursor:pointer; transition:background 0.2s; display:flex; align-items:center;"><i class="fas fa-paper-plane"></i></button>
+                        <span class="comment-msg" style="font-size:0.95em; margin-left:0.5rem; color:#b91c1c; align-self:center;"></span>
                     </form>
                 </div>
             </div>
@@ -501,35 +347,35 @@
             `;
         }
         html += rest.map(post => `
-            <div class="community-card ${post.type}${post.flagged ? ' flagged' : ''}">
-                <div class="community-meta">
+            <div class="community-card ${post.type}${post.flagged ? ' flagged' : ''}" style="background:var(--bg-secondary); border-radius:1rem; box-shadow:var(--shadow); padding:1.5rem 1.2rem 1.2rem 1.2rem; margin-bottom:1.7rem; position:relative; border-left:6px solid var(--secondary-color);">
+                <div class="community-meta" style="color:var(--text-secondary); font-size:0.98em; margin-bottom:0.7rem; display:flex; align-items:center; gap:0.7rem;">
                     ${renderAvatar(post.avatar, post.avatarUrl)}
-                    <span class="community-type ${post.type}">
+                    <span class="community-type ${post.type}" style="font-weight:bold; text-transform:capitalize; padding:0.2em 0.7em; border-radius:1em; font-size:0.95em; margin-right:0.7em; background:var(--bg-card); color:var(--secondary-color);">
                         ${post.type === 'encouragement' ? '<i class=\'fas fa-heart\'></i>Encouragement' : ''}
                         ${post.type === 'testimony' ? '<i class=\'fas fa-book-open\'></i>Testimony' : ''}
                         ${post.type === 'answered' ? '<i class=\'fas fa-star\'></i>Answered' : ''}
                     </span>
                     <span>${new Date(post.createdAt).toLocaleString()}</span>
-                    <button class="pin-btn" data-postid="${post.id}" data-action="pin"><i class="fas fa-thumbtack"></i> Pin</button>
-                    ${post.flagged ? '<span class="flagged-label">Flagged</span>' : `<button class="report-btn" data-postid="${post.id}"><i class="fas fa-flag"></i> Report</button>`}
+                    <button class="pin-btn" data-postid="${post.id}" data-action="pin" style="background:none; border:none; color:#f59e42; font-size:1.1rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;"><i class="fas fa-thumbtack"></i> Pin</button>
+                    ${post.flagged ? '<span class="flagged-label" style="color:#b91c1c; font-weight:bold; margin-left:0.7rem; font-size:0.98em;">Flagged</span>' : `<button class="report-btn" data-postid="${post.id}" style="background:none; border:none; color:#b91c1c; font-size:1.05rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;"><i class="fas fa-flag"></i> Report</button>`}
                 </div>
-                <div class="like-row">
-                    <button class="like-btn" data-postid="${post.id}" title="Like this post"><i class="fas fa-heart"></i></button>
-                    <span class="like-count" id="like-count-${post.id}">${post.likes || 0}</span>
+                <div class="like-row" style="display:flex; align-items:center; gap:0.7rem; margin-bottom:0.7rem;">
+                    <button class="like-btn" data-postid="${post.id}" title="Like this post" style="background:none; border:none; color:#e53e3e; font-size:1.3rem; cursor:pointer; transition:transform 0.1s; display:flex; align-items:center;"><i class="fas fa-heart"></i></button>
+                    <span class="like-count" id="like-count-${post.id}" style="font-size:1.05rem; color:#e53e3e; font-weight:600;">${post.likes || 0}</span>
                 </div>
-                <div class="community-message">${post.message.replace(/</g, '&lt;')}</div>
-                <div class="comments-section" id="comments-${post.id}">
+                <div class="community-message" style="font-size:1.13rem; line-height:1.7; margin-bottom:0.5rem; color:var(--text-primary);">${post.message.replace(/</g, '&lt;')}</div>
+                <div class="comments-section" id="comments-${post.id}" style="margin-top:1.2rem; background:var(--bg-card); border-radius:0.7rem; padding:1rem 0.8rem 0.7rem 0.8rem; box-shadow:0 2px 8px rgba(102,126,234,0.07);">
                     <div style="font-weight:600; color:var(--secondary-color); margin-bottom:0.5rem;">Comments</div>
                     ${post.comments && post.comments.length ? post.comments.map(comment => `
-                        <div class="comment${comment.flagged ? ' flagged' : ''}">
-                            <div class="comment-meta">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${post.id}\' data-commentid=\'${comment.id}\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
-                            <div class="comment-message">${comment.message.replace(/</g, '&lt;')}</div>
+                        <div class="comment${comment.flagged ? ' flagged' : ''}" style="margin-bottom:0.7rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-color);">
+                            <div class="comment-meta" style="color:var(--text-secondary); font-size:0.93em; margin-bottom:0.2rem;">${renderAvatar(comment.avatar, comment.avatarUrl)}${new Date(comment.createdAt).toLocaleString()}${comment.flagged ? ' <span class=\'flagged-label\' style=\'color:#b91c1c; font-weight:bold; margin-left:0.7rem; font-size:0.98em;\'>Flagged</span>' : ` <button class=\'report-btn\' data-postid=\'${post.id}\' data-commentid=\'${comment.id}\' style=\'background:none; border:none; color:#b91c1c; font-size:1.05rem; cursor:pointer; margin-left:0.7rem; transition:color 0.2s;\'><i class=\'fas fa-flag\'></i> Report</button>`}</div>
+                            <div class="comment-message" style="font-size:1.01rem; color:var(--text-primary);">${comment.message.replace(/</g, '&lt;')}</div>
                         </div>
                     `).join('') : '<div style="color:#888;">No comments yet.</div>'}
-                    <form class="comment-form" data-postid="${post.id}" onsubmit="return false;">
-                        <input type="text" placeholder="Add a comment..." maxlength="200" required />
-                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                        <span class="comment-msg"></span>
+                    <form class="comment-form" data-postid="${post.id}" onsubmit="return false;" style="display:flex; gap:0.5rem; margin-top:0.7rem;">
+                        <input type="text" placeholder="Add a comment..." maxlength="200" required style="flex:1; padding:0.5rem 0.8rem; border-radius:0.5rem; border:1px solid var(--border-color); font-size:1rem; background:var(--bg-secondary); color:var(--text-primary);" />
+                        <button type="submit" style="background:linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color:#fff; border:none; border-radius:0.5rem; padding:0.5rem 1.1rem; font-size:1rem; cursor:pointer; transition:background 0.2s; display:flex; align-items:center;"><i class="fas fa-paper-plane"></i></button>
+                        <span class="comment-msg" style="font-size:0.95em; margin-left:0.5rem; color:#b91c1c; align-self:center;"></span>
                     </form>
                 </div>
             </div>

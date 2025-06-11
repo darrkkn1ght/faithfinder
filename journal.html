@@ -6,12 +6,138 @@
     <title>FaithFinder Journal</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Modern toggle switch CSS -->
     <style>
         .journal-section { max-width: 800px; margin: 2rem auto; background: var(--bg-card); border-radius: 1rem; box-shadow: var(--shadow); padding: 2rem; }
-        .journal-section h2 { margin-bottom: 2rem; }
+        .journal-section h2 { margin-bottom: 2rem; color: var(--text-primary); }
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 44px;
+          height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background-color: #ccc;
+          transition: .4s;
+          border-radius: 24px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+          box-shadow: 0 1px 4px rgba(80,112,255,0.10);
+        }
+        input:checked + .slider {
+          background: linear-gradient(90deg, var(--secondary-color) 60%, var(--accent-color) 100%);
+        }
+        input:checked + .slider:before {
+          transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
+    <!-- FaithFinder Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-dove"></i>
+                <h1>FaithFinder</h1>
+            </div>
+            <div class="nav-controls" id="navControls">
+                <a href="journal.html" id="journalLink" class="control-btn" title="Journal" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-book"></i>
+                </a>
+                <a href="prayer.html" id="prayerLink" class="control-btn" title="Prayer Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-hands"></i>
+                </a>
+                <a href="community.html" id="communityLink" class="control-btn" title="Community Wall" style="text-decoration:none; border:none; background:none;" target="_blank" rel="noopener">
+                    <i class="fas fa-users"></i>
+                </a>
+                <span id="userStatus" style="display:flex; align-items:center; gap:0.5rem; margin-left:1rem;"></span>
+                <button id="settingsBtn" class="control-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="themeToggle" class="control-btn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3><i class="fas fa-sliders-h" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Settings</h3>
+                <button id="closeSettings" class="close-btn" title="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="setting-group">
+                <label for="themeSelect"><i class="fas fa-palette" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Color Theme</label>
+                <select id="themeSelect">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="sepia">Sepia</option>
+                    <option value="high-contrast">High Contrast</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label for="fontFamily"><i class="fas fa-font" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Style</label>
+                <select id="fontFamily">
+                    <option value="Georgia, serif">Georgia (Serif)</option>
+                    <option value="Arial, sans-serif">Arial (Sans-serif)</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="'Crimson Text', serif">Crimson Text</option>
+                </select>
+            </div>
+            <div class="setting-group" style="display:flex;align-items:center;gap:0.7rem;">
+                <label for="dyslexiaFont" style="margin:0;display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                    <i class="fas fa-universal-access" style="color:var(--secondary-color);"></i>
+                    Dyslexia-Friendly Font
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dyslexiaFont">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-group">
+                <label for="fontSize"><i class="fas fa-text-height" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Size</label>
+                <input type="range" id="fontSize" min="14" max="24" value="16">
+                <span id="fontSizeValue">16px</span>
+            </div>
+            <div class="setting-group">
+                <label for="lineSpacing"><i class="fas fa-arrows-alt-v" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Line Spacing</label>
+                <input type="range" id="lineSpacing" min="1" max="2" step="0.05" value="1.6">
+                <span id="lineSpacingValue">1.6</span>
+            </div>
+            <div class="setting-group">
+                <label for="dailyReminderToggle" style="display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-bell" style="color:var(--secondary-color);"></i>
+                    Enable Daily Verse Reminder
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dailyReminderToggle">
+                    <span class="slider round"></span>
+                </label>
+                <div id="reminderTimeGroup" style="display:none; margin-top:0.5rem;">
+                    <label for="reminderTime"><i class="fas fa-clock" style="margin-right:0.3rem;color:var(--secondary-color);"></i>Reminder Time</label>
+                    <input type="time" id="reminderTime" value="08:00">
+                </div>
+                <div id="reminderStatus" style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.95em;"></div>
+            </div>
+        </div>
+    </div>
     <section class="journal-section">
         <h2><i class="fas fa-book"></i> My Journal</h2>
         <div id="journalList">
@@ -75,5 +201,6 @@
     }
     document.addEventListener('DOMContentLoaded', renderJournal);
     </script>
+    <script src="settings.js"></script>
 </body>
 </html>

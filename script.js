@@ -1330,11 +1330,71 @@ function closeModal() {
     }
 }
 
+// Floating particles background
+function initParticlesBG() {
+    const container = document.querySelector('.particles-bg');
+    if (!container) return;
+    container.innerHTML = '';
+    const numParticles = 7; // Fewer particles for calm effect
+    for (let i = 0; i < numParticles; i++) {
+        const p = document.createElement('div');
+        p.className = 'float-particle';
+        const size = Math.random() * 16 + 10; // Smaller size
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.bottom = `-${size + Math.random() * 20}px`;
+        p.style.animationDuration = `${14 + Math.random() * 8}s`;
+        p.style.opacity = 0.10 + Math.random() * 0.18; // More transparent
+        // No background set here; CSS handles theme color
+        container.appendChild(p);
+    }
+}
+
+// Re-initialize particles on theme change
+function observeThemeChangeForParticles() {
+    const observer = new MutationObserver(() => {
+        initParticlesBG();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+}
+
+// Attach share events for Popular Verses
+function attachPopularVerseShareEvents() {
+    document.querySelectorAll('.popular-verse-card').forEach(card => {
+        const text = card.querySelector('.verse-text')?.textContent || '';
+        const reference = card.querySelector('.verse-reference')?.textContent || '';
+        card.querySelectorAll('.share-btn').forEach((btn, idx) => {
+            btn.onclick = () => {
+                const platforms = ['whatsapp', 'facebook', 'twitter', 'email'];
+                const platform = platforms[idx] || 'whatsapp';
+                if (window.faithFinder && window.faithFinder.shareVerse) {
+                    window.faithFinder.shareVerse(text, reference, platform);
+                }
+            };
+        });
+    });
+}
+
+// Animate fade-in for all .fade-in elements on load
+function animateFadeIns() {
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.classList.remove('fade-in');
+        void el.offsetWidth;
+        el.classList.add('fade-in');
+    });
+}
+
 // Initialize the app
 let faithFinder;
 document.addEventListener('DOMContentLoaded', () => {
     faithFinder = new FaithFinder();
+    window.faithFinder = faithFinder;
     initVoiceSearch();
+    initParticlesBG();
+    observeThemeChangeForParticles();
+    attachPopularVerseShareEvents();
+    animateFadeIns();
 });
 
 // Voice Search Functionality

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithFinder Entrance</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a2236 0%, #2563eb 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+        .entrance-main {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+        }
+        .entrance-section {
+            width: 90vw;
+            max-width: 900px;
+            margin: 5vh auto 5vh auto;
+            background: rgba(26,34,54,0.97);
+            box-shadow: 0 8px 40px 0 #3b82f6cc, 0 1.5px 8px #764ba244;
+            border-radius: 1.5rem;
+            padding: 2.5rem 2vw 2.5rem 2vw;
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            transform: translateY(80px) scale(0.98);
+            transition: opacity 0.9s cubic-bezier(.22,1,.36,1), transform 0.9s cubic-bezier(.22,1,.36,1);
+        }
+        .entrance-section.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .entrance-section h2 {
+            font-size: 2.5rem;
+            font-family: var(--font-family);
+            font-weight: 600;
+            margin-bottom: 0.7rem;
+            color: #fff;
+        }
+        .entrance-section h3 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #c7d2fe;
+            margin-bottom: 1.2rem;
+        }
+        .entrance-section p {
+            color: #e0e7ef;
+            font-size: 1.13rem;
+            margin-bottom: 1.2rem;
+        }
+        .scripture {
+            font-style: italic;
+            color: #a5b4fc;
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+        }
+        .entrance-btns {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.2rem;
+            margin-top: 1.2rem;
+        }
+        .cta-btn {
+            font-family: inherit;
+            font-size: 1.35rem;
+            font-weight: 700;
+            border-radius: 1.2rem;
+            padding: 1.2rem 3.5rem;
+            box-shadow: 0 6px 32px #2563eb55, 0 1.5px 8px #764ba244;
+            transition: box-shadow 0.25s, background 0.25s, color 0.25s, transform 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            border: none;
+            outline: none;
+            margin: 0.2rem 0;
+        }
+        .cta-btn.signup {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: #fff;
+        }
+        .cta-btn.signup:hover {
+            box-shadow: 0 12px 40px #764ba2cc, 0 1.5px 8px #2563eb44;
+            background: linear-gradient(135deg, #8f5de8 0%, #3b82f6 100%);
+            filter: brightness(1.08);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .cta-btn.login {
+            background: #fff;
+            color: #764ba2;
+            border: 2px solid #764ba2;
+        }
+        .cta-btn.login:hover {
+            background: #c7d2fe;
+            color: #2563eb;
+            border-color: #2563eb;
+            box-shadow: 0 12px 40px #2563eb33;
+            transform: translateY(-2px) scale(1.04);
+        }
+        .cta-message {
+            font-size: 1.25rem;
+            color: #c7d2fe;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        .how-works {
+            background: rgba(36, 49, 80, 0.7);
+            border-radius: 0.8rem;
+            padding: 1.2rem 1rem 0.7rem 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.2rem;
+        }
+        .how-works-title {
+            color: #c7d2fe;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.7rem;
+        }
+        .how-works-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        .how-works-step {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: #e0e7ef;
+            font-size: 0.98rem;
+        }
+        .how-works-step i {
+            color: #60a5fa;
+            font-size: 1.2rem;
+        }
+        .entrance-section .section-icon {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+        }
+        /* Header buttons */
+        .header-cta {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+        }
+        .header-cta-btn {
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 0.7rem;
+            padding: 0.7rem 1.7rem;
+            box-shadow: 0 2px 8px #2563eb33;
+            transition: box-shadow 0.22s, background 0.22s, color 0.22s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            border: none;
+            outline: none;
+        }
+        .header-cta-btn.signup {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: #fff;
+        }
+        .header-cta-btn.signup:hover {
+            box-shadow: 0 6px 18px #764ba2cc;
+            background: linear-gradient(135deg, #8f5de8 0%, #3b82f6 100%);
+            filter: brightness(1.08);
+            transform: translateY(-1px) scale(1.03);
+        }
+        .header-cta-btn.login {
+            background: #fff;
+            color: #764ba2;
+            border: 2px solid #764ba2;
+        }
+        .header-cta-btn.login:hover {
+            background: #c7d2fe;
+            color: #2563eb;
+            border-color: #2563eb;
+            box-shadow: 0 6px 18px #2563eb33;
+            transform: translateY(-1px) scale(1.03);
+        }
+        /* Animated floating emotion words */
+        .emotion-bg {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.13;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            filter: blur(2px);
+            user-select: none;
+            animation-timing-function: ease-in-out;
+        }
+        .emotion-bg1 {
+            top: 12%; left: 8%; font-size: 2.5rem; color: #60a5fa;
+            animation: floatEmotion1 18s infinite alternate;
+        }
+        .emotion-bg2 {
+            top: 70%; left: 12%; font-size: 2.1rem; color: #818cf8;
+            animation: floatEmotion2 22s infinite alternate;
+        }
+        .emotion-bg3 {
+            top: 30%; right: 10%; font-size: 2.3rem; color: #a5b4fc;
+            animation: floatEmotion3 20s infinite alternate;
+        }
+        .emotion-bg4 {
+            bottom: 10%; right: 18%; font-size: 2.2rem; color: #2563eb;
+            animation: floatEmotion4 24s infinite alternate;
+        }
+        .emotion-bg5 {
+            top: 55%; right: 5%; font-size: 2.1rem; color: #c7d2fe;
+            animation: floatEmotion5 19s infinite alternate;
+        }
+        @keyframes floatEmotion1 {
+            0% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(-30px) translateX(20px) scale(1.08); }
+            100% { transform: translateY(10px) translateX(-10px) scale(1.04); }
+        }
+        @keyframes floatEmotion2 {
+            0% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(25px) translateX(-18px) scale(1.07); }
+            100% { transform: translateY(-12px) translateX(10px) scale(1.03); }
+        }
+        @keyframes floatEmotion3 {
+            0% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(-22px) translateX(15px) scale(1.06); }
+            100% { transform: translateY(18px) translateX(-12px) scale(1.02); }
+        }
+        @keyframes floatEmotion4 {
+            0% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(18px) translateX(18px) scale(1.05); }
+            100% { transform: translateY(-15px) translateX(-10px) scale(1.01); }
+        }
+        @keyframes floatEmotion5 {
+            0% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(-18px) translateX(-15px) scale(1.04); }
+            100% { transform: translateY(12px) translateX(10px) scale(1.01); }
+        }
+        /* Christian symbols */
+        .cross-icon {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            font-size: 1.3rem;
+            color: #c7d2fe;
+            opacity: 0.7;
+        }
+        .dove-bg {
+            position: absolute;
+            left: 1.2rem;
+            bottom: 1.2rem;
+            font-size: 2.2rem;
+            color: #60a5fa;
+            opacity: 0.18;
+        }
+        /* Animated background particles */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.18;
+            z-index: 0;
+            background: radial-gradient(circle, #c7d2fe 0%, #2563eb 100%);
+            animation: floatParticle 18s linear infinite;
+            will-change: transform;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(0) scale(1); opacity: 0.18; }
+            50% { opacity: 0.32; }
+            100% { transform: translateY(-120vh) scale(1.2); opacity: 0.18; }
+        }
+        .particle.cross, .particle.dove {
+            background: none;
+            color: #c7d2fe;
+            font-size: 2.5rem;
+            opacity: 0.09;
+            animation: floatSymbol 28s linear infinite;
+            will-change: transform;
+        }
+        @keyframes floatSymbol {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.09; }
+            50% { opacity: 0.18; }
+            100% { transform: translateY(-120vh) scale(1.1) rotate(12deg); opacity: 0.09; }
+        }
+        /* Loader overlay */
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(26,34,54,0.98);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.4s;
+        }
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader-dove {
+            font-size: 3.5rem;
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+            animation: spinDove 1.2s linear infinite;
+        }
+        @keyframes spinDove {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.08); }
+        }
+        .loader-logo {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .loader-text {
+            color: #c7d2fe;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        @media (max-width: 900px) {
+            .entrance-section {
+                width: 97vw;
+                padding: 2rem 0.5rem 1.5rem 0.5rem;
+            }
+            .entrance-section h2 {
+                font-size: 1.7rem;
+            }
+            .header-cta-btn {
+                font-size: 0.95rem;
+                padding: 0.6rem 1.1rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .entrance-section {
+                padding: 1.2rem 0.2rem 1rem 0.2rem;
+                width: 99vw;
+            }
+            .entrance-section h2 {
+                font-size: 1.2rem;
+            }
+            .header-cta {
+                gap: 0.5rem;
+            }
+            .header-cta-btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader Overlay -->
+    <div class="loader-overlay hidden" id="loaderOverlay">
+        <div class="loader-dove"><i class="fas fa-dove"></i></div>
+        <div class="loader-logo"><i class="fas fa-dove"></i> FaithFinder</div>
+        <div class="loader-text">Loading...</div>
+    </div>
+    <!-- Animated background particles -->
+    <span class="particle" style="left:10vw;bottom:-10vh;width:60px;height:60px;animation-delay:0s;"></span>
+    <span class="particle" style="left:80vw;bottom:-20vh;width:40px;height:40px;animation-delay:3s;"></span>
+    <span class="particle" style="left:50vw;bottom:-15vh;width:80px;height:80px;animation-delay:7s;"></span>
+    <span class="particle" style="left:30vw;bottom:-18vh;width:30px;height:30px;animation-delay:10s;"></span>
+    <span class="particle cross" style="left:20vw;bottom:-12vh;animation-delay:5s;"><i class="fas fa-cross"></i></span>
+    <span class="particle dove" style="left:70vw;bottom:-10vh;animation-delay:12s;"><i class="fas fa-dove"></i></span>
+    <!-- Header (copied from main site, with CTAs) -->
+    <header class="header">
+        <div class="container" style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="nav-brand">
+                <i class="fas fa-dove"></i>
+                <h1>FaithFinder</h1>
+            </div>
+            <div class="header-cta">
+                <a href="signup.html" class="header-cta-btn signup" id="headerSignupBtn"><i class="fas fa-user-plus"></i> Sign Up</a>
+                <a href="login.html" class="header-cta-btn login" id="headerLoginBtn"><i class="fas fa-sign-in-alt"></i> Log In</a>
+            </div>
+        </div>
+    </header>
+    <main class="entrance-main fade-in">
+        <!-- Subtle animated emotion backgrounds -->
+        <span class="emotion-bg emotion-bg1">Anxiety</span>
+        <span class="emotion-bg emotion-bg2">Hope</span>
+        <span class="emotion-bg emotion-bg3">Peace</span>
+        <span class="emotion-bg emotion-bg4">Love</span>
+        <span class="emotion-bg emotion-bg5">Gratitude</span>
+        <!-- Section 1: Welcome -->
+        <section class="entrance-section" id="section1">
+            <span class="section-icon"><i class="fas fa-dove"></i></span>
+            <h2>Welcome to FaithFinder</h2>
+            <h3>Find Hope and Guidance in Scripture</h3>
+            <p>Your journey to peace, hope, and inspiration starts here. FaithFinder connects you with scripture and prayer for every moment.</p>
+        </section>
+        <!-- Section 2: Scripture -->
+        <section class="entrance-section" id="section2">
+            <span class="section-icon"><i class="fas fa-cross"></i></span>
+            <div class="scripture">“Come to me, all you who are weary and burdened, and I will give you rest.”<br><span style="font-size:0.95em;color:#c7d2fe;">— Matthew 11:28</span></div>
+        </section>
+        <!-- Section 3: How it works -->
+        <section class="entrance-section" id="section3">
+            <span class="section-icon"><i class="fas fa-bible"></i></span>
+            <div class="how-works">
+                <div class="how-works-title">How FaithFinder Works</div>
+                <div class="how-works-steps">
+                    <div class="how-works-step"><i class="fas fa-search"></i> Search by emotion or need</div>
+                    <div class="how-works-step"><i class="fas fa-bible"></i> Get relevant Bible verses & prayers</div>
+                    <div class="how-works-step"><i class="fas fa-users"></i> Join a supportive Christian community</div>
+                </div>
+            </div>
+        </section>
+        <!-- Section 4: Call to Action -->
+        <section class="entrance-section" id="section4">
+            <span class="section-icon"><i class="fas fa-arrow-right"></i></span>
+            <div class="cta-message">Ready to begin your journey? <br>Join a community of faith, hope, and love.<br><span style="color:#a5b4fc;font-size:1.1rem;">“Let all that you do be done in love.” — 1 Corinthians 16:14</span></div>
+            <div class="entrance-btns">
+                <a href="signup.html" class="cta-btn signup" id="ctaSignupBtn"><i class="fas fa-user-plus"></i> Sign Up</a>
+                <a href="login.html" class="cta-btn login" id="ctaLoginBtn"><i class="fas fa-sign-in-alt"></i> Log In</a>
+            </div>
+        </section>
+    </main>
+    <script>
+    // 3D Parallax for background particles and symbols
+    document.addEventListener('mousemove', function(e) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+        document.querySelectorAll('.particle, .emotion-bg').forEach((el, i) => {
+            const depth = 10 + (i % 5) * 8;
+            el.style.transform = `translate3d(${x * depth}px, ${y * depth}px, 0)`;
+        });
+    });
+    // Section scroll-in animation
+    function revealSectionsOnScroll() {
+        const sections = document.querySelectorAll('.entrance-section');
+        const trigger = window.innerHeight * 0.85;
+        sections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < trigger) {
+                section.classList.add('visible');
+            }
+        });
+    }
+    window.addEventListener('scroll', revealSectionsOnScroll);
+    window.addEventListener('DOMContentLoaded', () => {
+        revealSectionsOnScroll();
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 10);
+    });
+    // Loading overlay logic for navigation
+    function showLoaderAndGo(href) {
+        const loader = document.getElementById('loaderOverlay');
+        loader.classList.remove('hidden');
+        setTimeout(() => { window.location.href = href; }, 900);
+    }
+    // Attach to all navigation buttons
+    [
+        'headerSignupBtn', 'headerLoginBtn',
+        'ctaSignupBtn', 'ctaLoginBtn'
+    ].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showLoaderAndGo(this.href);
+            });
+        }
+    });
+    </script>
+</body>
+</html>

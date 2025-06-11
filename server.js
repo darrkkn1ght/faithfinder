@@ -9,9 +9,6 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = 3001;
 const DATA_FILE = path.join(__dirname, 'prayer_requests.json');
-
-// Serve static files (HTML, CSS, JS, images) from the project directory
-app.use(express.static(__dirname));
 const COMMUNITY_FILE = path.join(__dirname, 'community_wall.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = 'faithfinder_secret_key'; // Change this in production!
@@ -57,6 +54,7 @@ const communityPostSchema = new mongoose.Schema({
     message: String,
     createdAt: { type: Date, default: Date.now },
     comments: [commentSchema],
+    
     likes: { type: Number, default: 0 },
     flagged: { type: Boolean, default: false },
     pinned: { type: Boolean, default: false },

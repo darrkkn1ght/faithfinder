@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div class="particles-bg"></div>
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -40,11 +41,11 @@
     <div id="settingsPanel" class="settings-panel">
         <div class="settings-content">
             <div class="settings-header">
-                <h3>Settings</h3>
-                <button id="closeSettings" class="close-btn">&times;</button>
+                <h3><i class="fas fa-sliders-h" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Settings</h3>
+                <button id="closeSettings" class="close-btn" title="Close"><i class="fas fa-times"></i></button>
             </div>
             <div class="setting-group">
-                <label for="themeSelect">Color Theme:</label>
+                <label for="themeSelect"><i class="fas fa-palette" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Color Theme</label>
                 <select id="themeSelect">
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
@@ -55,7 +56,7 @@
                 </select>
             </div>
             <div class="setting-group">
-                <label for="fontFamily">Font Style:</label>
+                <label for="fontFamily"><i class="fas fa-font" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Style</label>
                 <select id="fontFamily">
                     <option value="Georgia, serif">Georgia (Serif)</option>
                     <option value="Arial, sans-serif">Arial (Sans-serif)</option>
@@ -64,25 +65,37 @@
                     <option value="'Crimson Text', serif">Crimson Text</option>
                 </select>
             </div>
-            <div class="setting-group">
-                <label><input type="checkbox" id="dyslexiaFont"> Dyslexia-Friendly Font</label>
+            <div class="setting-group" style="display:flex;align-items:center;gap:0.7rem;">
+                <label for="dyslexiaFont" style="margin:0;display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                    <i class="fas fa-universal-access" style="color:var(--secondary-color);"></i>
+                    Dyslexia-Friendly Font
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dyslexiaFont">
+                    <span class="slider round"></span>
+                </label>
             </div>
             <div class="setting-group">
-                <label for="fontSize">Font Size:</label>
+                <label for="fontSize"><i class="fas fa-text-height" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Font Size</label>
                 <input type="range" id="fontSize" min="14" max="24" value="16">
                 <span id="fontSizeValue">16px</span>
             </div>
             <div class="setting-group">
-                <label for="lineSpacing">Line Spacing:</label>
+                <label for="lineSpacing"><i class="fas fa-arrows-alt-v" style="margin-right:0.5rem;color:var(--secondary-color);"></i>Line Spacing</label>
                 <input type="range" id="lineSpacing" min="1" max="2" step="0.05" value="1.6">
                 <span id="lineSpacingValue">1.6</span>
             </div>
             <div class="setting-group">
-                <label for="dailyReminderToggle">
-                    <input type="checkbox" id="dailyReminderToggle"> Enable Daily Verse Reminder
+                <label for="dailyReminderToggle" style="display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-bell" style="color:var(--secondary-color);"></i>
+                    Enable Daily Verse Reminder
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="dailyReminderToggle">
+                    <span class="slider round"></span>
                 </label>
                 <div id="reminderTimeGroup" style="display:none; margin-top:0.5rem;">
-                    <label for="reminderTime">Reminder Time:</label>
+                    <label for="reminderTime"><i class="fas fa-clock" style="margin-right:0.3rem;color:var(--secondary-color);"></i>Reminder Time</label>
                     <input type="time" id="reminderTime" value="08:00">
                 </div>
                 <div id="reminderStatus" style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.95em;"></div>
@@ -90,17 +103,58 @@
         </div>
     </div>
 
+    <!-- Modern toggle switch CSS -->
+    <style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(80,112,255,0.10);
+    }
+    input:checked + .slider {
+      background: linear-gradient(90deg, var(--secondary-color) 60%, var(--accent-color) 100%);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    </style>
+
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
+            <!-- Weekly Spiritual Theme Banner -->
+            <div class="weekly-theme-banner fade-in">
+                <span id="weeklyTheme">Weekly Theme: Walking in Faith</span>
+            </div>
             <!-- Hero Section -->
-            <section class="hero">
+            <section class="hero fade-in">
                 <h2>Find Hope and Guidance in Scripture</h2>
                 <p>Discover Bible verses, prayers, and inspiration for your current situation</p>
             </section>
 
             <!-- Search Section -->
-            <section class="search-section">
+            <section class="search-section fade-in">
                 <div class="search-container">
     <input type="text" id="searchInput" placeholder="How are you feeling? (e.g., anxious, grateful, lonely...)">
     <button id="voiceSearchBtn" onclick="startVoiceSearch()" title="Voice Search">
@@ -124,7 +178,7 @@
             </section>
 
             <!-- Results Container -->
-            <div id="resultsContainer" class="results-container">
+            <div id="resultsContainer" class="results-container fade-in">
                 <!-- Daily Verse (shown by default) -->
                 <section class="daily-verse">
                     <h3><i class="fas fa-sun"></i> Verse of the Day</h3>
@@ -154,7 +208,7 @@
             </div>
 
             <!-- Inspirational Quote Section -->
-            <section class="quote-section">
+            <section class="quote-section fade-in">
                 <h3><i class="fas fa-quote-left"></i> Daily Inspiration</h3>
                 <div class="quote-card">
                     <div class="quote-text" id="dailyQuote">
@@ -164,7 +218,43 @@
                     <button id="newQuoteBtn" class="secondary-btn">New Quote</button>
                 </div>
             </section>
+
+            <!-- Popular Verses Section -->
+            <section class="popular-verses-section fade-in">
+                <h3><i class="fas fa-fire"></i> Popular Verses</h3>
+                <div class="popular-verse-card">
+                    <div class="verse-text">"I can do all things through Christ who strengthens me."</div>
+                    <div class="verse-reference">Philippians 4:13</div>
+                    <div class="verse-share-group">
+                        <button class="share-btn" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="share-btn" title="Share on Facebook"><i class="fab fa-facebook"></i></button>
+                        <button class="share-btn" title="Share on Twitter"><i class="fab fa-twitter"></i></button>
+                        <button class="share-btn" title="Share by Email"><i class="fas fa-envelope"></i></button>
                     </div>
+                </div>
+                <div class="popular-verse-card">
+                    <div class="verse-text">"The Lord is my shepherd; I shall not want."</div>
+                    <div class="verse-reference">Psalm 23:1</div>
+                    <div class="verse-share-group">
+                        <button class="share-btn" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="share-btn" title="Share on Facebook"><i class="fab fa-facebook"></i></button>
+                        <button class="share-btn" title="Share on Twitter"><i class="fab fa-twitter"></i></button>
+                        <button class="share-btn" title="Share by Email"><i class="fas fa-envelope"></i></button>
+                    </div>
+                </div>
+                <div class="popular-verse-card">
+                    <div class="verse-text">"Trust in the Lord with all your heart and lean not on your own understanding."</div>
+                    <div class="verse-reference">Proverbs 3:5</div>
+                    <div class="verse-share-group">
+                        <button class="share-btn" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="share-btn" title="Share on Facebook"><i class="fab fa-facebook"></i></button>
+                        <button class="share-btn" title="Share on Twitter"><i class="fab fa-twitter"></i></button>
+                        <button class="share-btn" title="Share by Email"><i class="fas fa-envelope"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            </div>
     </main>
 
     <!-- Footer -->
@@ -179,6 +269,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="settings.js"></script>
     <script>
     // Login/logout state display
     function renderUserStatus() {

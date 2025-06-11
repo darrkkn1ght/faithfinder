@@ -8,10 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a2236 0%, #2563eb 100%);
             min-height: 100vh;
             font-family: var(--font-family, Georgia, serif);
-            color: var(--text-primary, #2d3748);
+            color: var(--text-primary);
+        }
+        .auth-main {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
         }
         .auth-section {
             max-width: 400px;
@@ -26,13 +35,13 @@
             font-size: 2rem;
             font-weight: 700;
             text-align: center;
-            color: var(--primary-color);
+            color: var(--secondary-color);
         }
         .auth-form label {
             font-weight: 600;
             margin-bottom: 0.25rem;
             display: block;
-            color: var(--primary-color);
+            color: var(--secondary-color);
         }
         .auth-form input {
             width: 100%;
@@ -40,7 +49,7 @@
             padding: 0.85rem 1rem;
             border-radius: 0.7rem;
             border: 1.5px solid var(--border-color);
-            background: var(--bg-card);
+            background: var(--bg-primary);
             font-size: 1.05rem;
             color: var(--text-primary);
             transition: border-color 0.3s;
@@ -58,7 +67,7 @@
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.13);
+            box-shadow: var(--shadow);
             transition: background 0.3s, transform 0.2s;
         }
         .auth-form button[type="submit"]:hover {
@@ -78,9 +87,57 @@
             text-decoration: underline;
             font-size: 1rem;
         }
+        /* Loader overlay */
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(26,34,54,0.98);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.4s;
+        }
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader-dove {
+            font-size: 3.5rem;
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+            animation: spinDove 1.2s linear infinite;
+        }
+        @keyframes spinDove {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.08); }
+        }
+        .loader-logo {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .loader-text {
+            color: #c7d2fe;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
+    <!-- Loader Overlay -->
+    <div class="loader-overlay hidden" id="loaderOverlay">
+        <div class="loader-dove"><i class="fas fa-dove"></i></div>
+        <div class="loader-logo"><i class="fas fa-dove"></i> FaithFinder</div>
+        <div class="loader-text">Loading...</div>
+    </div>
     <section class="auth-section">
         <h2><i class="fas fa-sign-in-alt"></i> Sign In</h2>
         <form class="auth-form" id="loginForm">
@@ -91,18 +148,22 @@
             <button type="submit"><i class="fas fa-sign-in-alt"></i> Sign In</button>
             <div id="authMsg"></div>
         </form>
-        <a href="signup.html" class="auth-link">Don't have an account? Sign Up</a>
+        <a href="signup.html" class="auth-link" id="signupLink">Don't have an account? Sign Up</a>
     </section>
     <script>
     const API_URL = 'https://faithfinder.onrender.com/api/auth/login';
-    document.getElementById('loginForm').addEventListener('submit', async e => {
+    const loginForm = document.getElementById('loginForm');
+    const loader = document.getElementById('loaderOverlay');
+    loginForm.addEventListener('submit', async e => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const msg = document.getElementById('authMsg');
         msg.textContent = '';
         msg.style.color = '';
+        loader.classList.remove('hidden');
         if (!email || !password) {
+            loader.classList.add('hidden');
             msg.style.color = 'red';
             msg.textContent = 'Email and password are required.';
             return;
@@ -119,11 +180,18 @@
             localStorage.setItem('faithfinder_user', JSON.stringify(data.user));
             msg.style.color = 'green';
             msg.textContent = 'Sign in successful! Redirecting...';
-            setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+            setTimeout(() => { window.location.href = 'index.html'; }, 700);
         } catch (err) {
+            loader.classList.add('hidden');
             msg.style.color = 'red';
             msg.textContent = err.message || 'Sign in failed.';
         }
+    });
+    // Loader for signup link
+    document.getElementById('signupLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        loader.classList.remove('hidden');
+        setTimeout(() => { window.location.href = this.href; }, 700);
     });
     </script>
 </body>
