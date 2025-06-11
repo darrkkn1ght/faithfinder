@@ -64,13 +64,12 @@ const CommunityPost = mongoose.model('CommunityPost', communityPostSchema);
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
-// Serve static files from the current directory
-app.use(express.static(__dirname));
-
-// Serve entrance.html at root
+// Serve entrance.html at root FIRST
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'entrance.html'));
 });
+// Serve static files from the current directory
+app.use(express.static(__dirname));
 
 // Helper to read/write JSON file
 // MongoDB now handles all data, so these are no longer needed.
